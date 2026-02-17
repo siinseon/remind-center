@@ -37,10 +37,22 @@
     body {
       background: var(--paper);
       color: var(--ink);
+      width: 100%;
       max-width: 450px;
       margin: 0 auto;
       min-height: 100dvh;
+      min-height: 100vh;
       letter-spacing: -0.5px;
+    }
+    @media (min-width: 640px) {
+      body {
+        max-width: 480px;
+        min-height: 640px;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.08);
+      }
+    }
+    @supports (padding: env(safe-area-inset-bottom)) {
+      body { padding-bottom: env(safe-area-inset-bottom); }
     }
     .body-weather-period {
       background: repeating-linear-gradient(135deg, rgba(255,182,193,0.2) 0px, rgba(255,182,193,0.2) 8px, transparent 8px, transparent 16px),
@@ -55,8 +67,22 @@
       from { transform: translateY(100%); }
       to { transform: translateY(0); }
     }
+    @keyframes bin-rise {
+      from { transform: translateY(100%) scale(0.8); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes paper-suck {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      50% { transform: translateY(35dvh) scale(0.5); opacity: 1; }
+      100% { transform: translateY(55dvh) scale(0.08); opacity: 0; }
+    }
     .animate-suck-in { animation: suck-in 0.55s ease-in forwards; }
     .animate-slide-up { animation: slide-up 0.3s ease-out; }
+    .animate-bin-rise { animation: bin-rise 0.5s ease-out forwards; }
+    .animate-paper-suck { animation: paper-suck 0.6s ease-in forwards; }
+    body.dump-modal-open #tabBar { visibility: hidden; pointer-events: none; }
+    .dump-throw-btn { opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .dump-throw-btn.throw-visible { opacity: 1; pointer-events: auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     .dump-bin {
@@ -68,34 +94,22 @@
       box-shadow: 0 0 28px rgba(5, 150, 105, 0.4), 0 4px 14px rgba(0,0,0,0.12);
       transform: scale(1.05);
     }
-    .dump-bin::before, .dump-bin::after {
-      content: '';
-      position: absolute;
-      bottom: -3px;
-      width: 10px;
-      height: 10px;
-      background: #047857;
-      border-radius: 50%;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    }
-    .dump-bin::before { left: 6px; }
-    .dump-bin::after { right: 6px; }
   </style>
 </head>
 <body class="antialiased pb-28 overscroll-none">
   <!-- Header: Glassmorphism -->
   <header id="header" class="sticky top-0 z-20 bg-transparent backdrop-blur-md">
-    <div class="px-5 py-4 flex items-center justify-between">
-      <h1 class="text-[24px] font-bold text-emerald tracking-stationery">RE:MIND</h1>
-      <button type="button" id="bodyWeatherBtn" class="text-sm font-medium text-sky rounded-full px-4 py-2 bg-sky/10 shadow-soft hover:bg-sky/15 transition-colors tracking-stationery">오늘의 바디웨더</button>
+    <div class="px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
+      <h1 class="text-[22px] sm:text-[24px] font-bold text-emerald tracking-stationery">RE:MIND</h1>
+      <button type="button" id="bodyWeatherBtn" class="text-xs sm:text-sm font-medium text-sky rounded-full px-3 py-1.5 sm:px-4 sm:py-2 bg-sky/10 shadow-soft hover:bg-sky/15 transition-colors tracking-stationery">오늘의 바디웨더</button>
     </div>
   </header>
 
-  <main class="px-5 py-5 min-h-[60vh]">
+  <main class="px-4 py-4 sm:px-6 sm:py-5 min-h-[60vh]">
     <!-- Schedule -->
     <section id="panel-schedule" class="tab-content active">
       <div class="flex items-center justify-between mb-5">
-        <h2 class="text-[24px] font-bold text-ink tracking-stationery">일정</h2>
+        <h2 class="text-[20px] sm:text-[24px] font-bold text-ink tracking-stationery">Calendar</h2>
         <div class="flex gap-2 flex-wrap justify-end">
           <button type="button" data-preset="연차" class="preset-btn text-sm font-medium px-3 py-2 rounded-2xl bg-emerald-soft text-emerald shadow-soft hover:shadow-soft-lg transition-shadow tracking-stationery">연차</button>
           <button type="button" data-preset="노래 수업" class="preset-btn text-sm font-medium px-3 py-2 rounded-2xl bg-emerald-soft text-emerald shadow-soft hover:shadow-soft-lg transition-shadow tracking-stationery">노래 수업</button>
@@ -107,7 +121,7 @@
 
     <!-- Diary -->
     <section id="panel-diary" class="tab-content">
-      <h2 class="text-[24px] font-bold text-ink tracking-stationery mb-5">일기</h2>
+      <h2 class="text-[20px] sm:text-[24px] font-bold text-ink tracking-stationery mb-5">Archive</h2>
       <div id="diaryList" class="space-y-5"></div>
     </section>
 
@@ -121,69 +135,85 @@
 
     <!-- Memo -->
     <section id="panel-memo" class="tab-content">
-      <h2 class="text-[24px] font-bold text-ink tracking-stationery mb-5">메모</h2>
+      <h2 class="text-[20px] sm:text-[24px] font-bold text-ink tracking-stationery mb-5">Memo</h2>
       <div id="memoByTag" class="space-y-5"></div>
     </section>
 
     <!-- Garden -->
     <section id="panel-garden" class="tab-content">
-      <h2 class="text-[24px] font-bold text-ink tracking-stationery mb-5">가든</h2>
+      <h2 class="text-[20px] sm:text-[24px] font-bold text-ink tracking-stationery mb-5">Garden</h2>
       <div id="gardenGrid" class="grid grid-cols-2 gap-4"></div>
     </section>
   </main>
 
   <!-- Floating Tab Bar (Pill) -->
-  <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[420px] z-30 px-2">
-    <div class="h-16 rounded-full bg-white/80 backdrop-blur-md shadow-soft-lg flex items-center justify-center gap-0 overflow-hidden">
+  <nav id="tabBar" class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] max-w-[420px] z-30 px-2 transition-[visibility] duration-0" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
+    <div class="h-16 rounded-full bg-white/80 backdrop-blur-md shadow-soft-lg flex items-center justify-center gap-0">
       <button type="button" data-tab="schedule" class="tab-btn flex-1 flex flex-col items-center justify-center py-2 text-ink/50 data-[active=true]:text-emerald transition-colors min-h-[4rem]">
-        <span class="text-[22px] leading-none">📅</span>
-        <span class="text-[11px] font-medium mt-0.5 tracking-stationery">일정</span>
+        <span class="text-[11px] font-medium tracking-stationery">Calendar</span>
       </button>
       <button type="button" data-tab="diary" class="tab-btn flex-1 flex flex-col items-center justify-center py-2 text-ink/50 data-[active=true]:text-emerald transition-colors min-h-[4rem]">
-        <span class="text-[22px] leading-none">📔</span>
-        <span class="text-[11px] font-medium mt-0.5 tracking-stationery">일기</span>
+        <span class="text-[11px] font-medium tracking-stationery">Archive</span>
       </button>
-      <button type="button" id="dumpTrigger" class="dump-bin flex-shrink-0 -mt-8 w-[56px] h-[56px] rounded-full bg-emerald flex items-center justify-center text-white text-[28px] flex-shrink-0" title="분리수거">🗑️</button>
+      <button type="button" id="dumpTrigger" class="dump-bin flex-shrink-0 -mt-8 w-[56px] h-[56px] rounded-full bg-emerald flex items-center justify-center text-white flex-shrink-0 p-0" title="분리수거">
+        <svg class="w-7 h-7 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
       <button type="button" data-tab="memo" class="tab-btn flex-1 flex flex-col items-center justify-center py-2 text-ink/50 data-[active=true]:text-emerald transition-colors min-h-[4rem]">
-        <span class="text-[22px] leading-none">📌</span>
-        <span class="text-[11px] font-medium mt-0.5 tracking-stationery">메모</span>
+        <span class="text-[11px] font-medium tracking-stationery">Memo</span>
       </button>
       <button type="button" data-tab="garden" class="tab-btn flex-1 flex flex-col items-center justify-center py-2 text-ink/50 data-[active=true]:text-emerald transition-colors min-h-[4rem]">
-        <span class="text-[22px] leading-none">🌸</span>
-        <span class="text-[11px] font-medium mt-0.5 tracking-stationery">가든</span>
+        <span class="text-[11px] font-medium tracking-stationery">Garden</span>
       </button>
     </div>
   </nav>
 
-  <!-- The Dump Modal -->
-  <div id="dumpModal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-ink/30 backdrop-blur-sm" data-close="dumpModal"></div>
-    <div class="absolute bottom-0 left-0 right-0 max-w-[450px] mx-auto bg-paper rounded-t-[2rem] shadow-soft-lg p-6 pb-12 animate-slide-up">
-      <h3 class="text-[22px] font-bold text-ink tracking-stationery mb-5">분리수거하기</h3>
-      <textarea id="dumpText" rows="4" class="w-full rounded-2xl p-4 resize-none bg-white shadow-soft focus:ring-2 focus:ring-emerald/30 outline-none text-ink placeholder:text-ink/40 tracking-stationery" placeholder="내용, #태그, 시간(예: 15:00) 등을 입력하세요"></textarea>
-      <div class="mt-4 flex items-center gap-3">
-        <label class="text-sm font-medium text-ink/70 tracking-stationery shrink-0">날짜·시간</label>
-        <input type="datetime-local" id="dumpDateTime" class="flex-1 rounded-xl px-4 py-3 bg-white shadow-soft text-ink outline-none focus:ring-2 focus:ring-emerald/30 text-sm" />
+  <!-- The Dump Modal: Immersive Full-Screen -->
+  <div id="dumpModal" class="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] sm:max-w-[480px] h-[100dvh] h-[100vh] z-[50] hidden flex-col bg-[#F5F5F5]/98">
+    <button type="button" id="dumpModalClose" class="absolute top-5 right-5 z-[52] w-11 h-11 rounded-full bg-ink/10 flex items-center justify-center text-ink text-xl font-bold hover:bg-ink/20 transition-colors" aria-label="닫기">×</button>
+    <div class="flex-1 flex flex-col min-h-0 pt-14 px-4 sm:px-6 pb-4">
+      <textarea id="dumpText" rows="6" class="flex-1 min-h-[40dvh] w-full p-4 resize-none bg-transparent text-ink text-[17px] placeholder:text-ink/40 outline-none tracking-stationery" placeholder="여기에 맘껏 쏟아내세요...&#10;&#10;#태그, 시간(15:00) 등도 함께 적어도 돼요."></textarea>
+      <div id="dumpOptions" class="mt-3 space-y-2 text-sm">
+        <div class="flex items-center gap-2">
+          <label class="text-ink/60 shrink-0 w-20">날짜·시간</label>
+          <input type="datetime-local" id="dumpDateTime" class="flex-1 rounded-xl px-3 py-2 bg-white/80 shadow-soft text-ink outline-none text-sm" />
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-ink/60 shrink-0 w-20">반복</label>
+          <select id="dumpRecurring" class="flex-1 rounded-xl px-3 py-2 bg-white/80 shadow-soft text-ink outline-none text-sm">
+            <option value="">없음</option>
+            <option value="weekly">매주</option>
+            <option value="monthly">매월</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-ink/60 block mb-1">사진 (선택)</label>
+          <input type="file" id="dumpImage" accept="image/*" class="w-full text-sm text-ink/60 file:py-2 file:px-3 file:rounded-lg file:bg-white/80 file:text-emerald file:font-medium" />
+        </div>
       </div>
-      <div class="mt-4 flex items-center gap-3">
-        <label class="text-sm font-medium text-ink/70 tracking-stationery shrink-0">반복</label>
-        <select id="dumpRecurring" class="flex-1 rounded-xl px-4 py-3 bg-white shadow-soft text-ink outline-none focus:ring-2 focus:ring-emerald/30 text-sm">
-          <option value="">없음</option>
-          <option value="weekly">매주</option>
-          <option value="monthly">매월</option>
-        </select>
+    </div>
+    <div class="flex-shrink-0 flex flex-col items-center pb-8 pt-2">
+      <button type="button" id="dumpSubmit" class="dump-throw-btn w-[calc(100%-2.5rem)] max-w-[320px] py-4 rounded-2xl bg-emerald text-white font-bold text-[16px] shadow-soft-lg hover:bg-emerald-light transition-all tracking-stationery">분리수거 하기 (던지기)</button>
+      <div id="dumpBinWrap" class="mt-4 animate-bin-rise w-40 h-40 flex items-center justify-center">
+        <svg id="dumpBinSvg" class="w-full h-full drop-shadow-lg" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="#059669" d="M341.511,503.983H167.111c-17.519,0-32.206-13.236-34.021-30.661L93.528,93.528h290.739L341.511,503.983z"/>
+          <path fill="#047857" d="M384.267,93.528H93.528l6.235,59.858l33.327,319.936c1.815,17.424,16.502,30.661,34.021,30.661h25.653c-17.519,0-32.206-13.236-34.021-30.661l-32.344-310.5c-0.526-5.046,3.432-9.437,8.505-9.437h243.127L384.267,93.528z"/>
+          <path fill="#059669" d="M401.37,127.733H76.426c-9.446,0-17.102-7.656-17.102-17.102V59.324h359.148v51.307C418.472,120.076,410.815,127.733,401.37,127.733z"/>
+          <rect x="59.324" y="59.324" fill="#047857" width="359.148" height="17.102"/>
+          <path fill="#059669" d="M418.472,59.324H59.324V42.221c0-18.891,15.314-34.205,34.205-34.205h290.739c18.891,0,34.205,15.314,34.205,34.205V59.324z"/>
+          <path fill="#10B981" d="M384.267,8.017H93.528c-12.805,0-23.959,7.041-29.822,17.458h350.383C408.227,15.058,397.073,8.017,384.267,8.017z"/>
+          <circle fill="#D1FAE5" cx="341.511" cy="461.228" r="42.756"/>
+          <circle fill="#6B7280" cx="341.511" cy="461.228" r="17.102"/>
+        </svg>
       </div>
-      <div class="mt-4">
-        <label class="block text-sm font-medium text-ink/70 mb-2 tracking-stationery">사진 (선택)</label>
-        <input type="file" id="dumpImage" accept="image/*" class="block w-full text-sm text-ink/60 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-emerald-soft file:text-emerald file:font-medium file:shadow-soft" />
-      </div>
-      <button type="button" id="dumpSubmit" class="mt-6 w-full py-4 rounded-2xl bg-emerald text-white font-bold text-[16px] shadow-soft hover:shadow-soft-lg hover:bg-emerald-light transition-all tracking-stationery">슈슉– 넣기</button>
     </div>
   </div>
 
-  <!-- Suck-in overlay -->
-  <div id="suckOverlay" class="fixed inset-0 z-[60] pointer-events-none hidden items-center justify-center bg-ink/15">
-    <div id="suckCard" class="absolute w-20 h-20 rounded-2xl bg-emerald flex items-center justify-center text-white text-3xl shadow-soft-lg" style="top: 50%; left: 50%; margin: -40px 0 0 -40px;"></div>
+  <!-- Paper suck animation (inside modal, so z-[51]) -->
+  <div id="suckOverlay" class="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] sm:max-w-[480px] h-[100dvh] z-[51] pointer-events-none hidden items-center justify-center">
+    <div id="suckCard" class="absolute w-24 h-28 rounded-lg bg-white shadow-soft-lg flex items-center justify-center text-ink/80 text-2xl border border-ink/10" style="top: 25dvh; left: 50%; margin-left: -48px;"></div>
   </div>
 
   <script>
@@ -269,34 +299,45 @@
       const dumpImage = document.getElementById('dumpImage');
       const suckOverlay = document.getElementById('suckOverlay');
 
-      dumpTrigger.addEventListener('click', () => {
+      function openDumpModal() {
+        document.body.classList.add('dump-modal-open');
         dumpModal.classList.remove('hidden');
         dumpModal.classList.add('flex');
         dumpText.value = '';
         dumpDateTime.value = '';
         dumpRecurring.value = '';
         dumpImage.value = '';
-      });
-      dumpModal.querySelector('[data-close="dumpModal"]').addEventListener('click', () => {
+        dumpSubmit.classList.remove('throw-visible');
+        dumpBinWrap.classList.remove('animate-bin-rise');
+        void dumpBinWrap.offsetWidth;
+        dumpBinWrap.classList.add('animate-bin-rise');
+      }
+      function closeDumpModal() {
+        document.body.classList.remove('dump-modal-open');
         dumpModal.classList.add('hidden');
         dumpModal.classList.remove('flex');
+      }
+      dumpTrigger.addEventListener('click', openDumpModal);
+      document.getElementById('dumpModalClose').addEventListener('click', closeDumpModal);
+      dumpText.addEventListener('input', () => {
+        dumpSubmit.classList.toggle('throw-visible', dumpText.value.trim().length > 0);
       });
 
       function playSuckAnimation(callback) {
         const card = document.getElementById('suckCard');
         card.textContent = '📄';
-        card.className = 'absolute w-20 h-20 rounded-2xl bg-emerald flex items-center justify-center text-white text-3xl shadow-soft-lg animate-suck-in';
-        card.style.cssText = 'top: 50%; left: 50%; margin: -40px 0 0 -40px;';
+        card.className = 'absolute w-24 h-28 rounded-lg bg-white shadow-soft-lg flex items-center justify-center text-ink/80 text-2xl border border-ink/10 animate-paper-suck';
+        card.style.cssText = 'top: 20dvh; left: 50%; margin-left: -48px;';
         suckOverlay.classList.remove('hidden');
         suckOverlay.classList.add('flex');
         setTimeout(() => {
-          card.className = 'absolute w-20 h-20 rounded-2xl bg-emerald flex items-center justify-center text-white text-3xl shadow-soft-lg';
+          card.className = 'absolute w-24 h-28 rounded-lg bg-white shadow-soft-lg flex items-center justify-center text-ink/80 text-2xl border border-ink/10';
           card.textContent = '';
           card.style.cssText = '';
           suckOverlay.classList.add('hidden');
           suckOverlay.classList.remove('flex');
           if (callback) callback();
-        }, 580);
+        }, 650);
       }
 
       dumpSubmit.addEventListener('click', async () => {
@@ -321,7 +362,7 @@
         const timeStr = dateTimeVal ? dateTimeVal.slice(11, 16) : (timeInText ? `${String(timeInText.hours).padStart(2,'0')}:${String(timeInText.minutes).padStart(2,'0')}` : null);
 
         if (dateStr && (timeStr || recurring)) {
-          const title = text.replace(/#[\w가-힣]+/g, '').replace(/\d{1,2}:\d{2}/g, '').trim() || '일정';
+          const title = text.replace(/#[\w가-힣]+/g, '').replace(/\d{1,2}:\d{2}/g, '').trim() || 'Schedule';
           schedules.push({
             id: id(),
             title,
@@ -363,8 +404,7 @@
         }
         save();
         playSuckAnimation(() => {
-          dumpModal.classList.add('hidden');
-          dumpModal.classList.remove('flex');
+          closeDumpModal();
           renderAll();
         });
       });
@@ -432,7 +472,7 @@
         const relevant = schedules.filter(s => s.date >= today).sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
         list.innerHTML = relevant.slice(0, 30).map(s =>
           '<div class="flex items-center gap-3 py-3 px-4 rounded-2xl bg-white shadow-soft"><span class="text-sm font-bold text-emerald shrink-0">' + s.date + (s.time ? ' ' + s.time : '') + '</span><span class="text-ink font-medium truncate">' + escapeHtml(s.title) + '</span></div>'
-        ).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center tracking-stationery">등록된 일정이 없습니다.</p>';
+        ).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center tracking-stationery">No schedules yet.</p>';
       }
 
       function renderDiary() {
@@ -445,7 +485,7 @@
           if (d.imageBase64) block += '<img src="' + d.imageBase64 + '" alt="" class="w-full rounded-2xl mb-4 max-h-52 object-cover shadow-soft" />';
           block += '<p class="text-ink leading-relaxed whitespace-pre-wrap text-[15px] tracking-stationery">' + escapeHtml(d.content || '') + '</p></div>';
           return block;
-        }).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center tracking-stationery">일기가 없습니다.</p>';
+        }).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center tracking-stationery">No entries yet.</p>';
       }
 
       function renderMemo() {
@@ -462,7 +502,7 @@
           '<div class="rounded-3xl p-5 bg-white shadow-soft"><h4 class="text-emerald font-bold text-[16px] mb-3 tracking-stationery">#' + escapeHtml(tag) + '</h4><ul class="space-y-2">' +
           byTag[tag].map(m => '<li class="text-ink/80 text-[15px] leading-relaxed">' + escapeHtml(m.content.slice(0, 120) + (m.content.length > 120 ? '…' : '')) + '</li>').join('') +
           '</ul></div>'
-        ).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center tracking-stationery">#태그 메모가 없습니다.</p>';
+        ).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center tracking-stationery">No tagged memos yet.</p>';
       }
 
       function growthStage(count) {
@@ -482,7 +522,7 @@
           const icons = useCosmos ? COSMOS : LILY;
           const name = useCosmos ? '코스모스' : '은방울꽃';
           return '<div class="rounded-3xl p-5 bg-white shadow-soft text-center"><div class="text-[32px] mb-2">' + icons[stage - 1] + '</div><div class="text-emerald font-bold text-[15px] tracking-stationery">#' + escapeHtml(tag) + '</div><div class="text-[12px] text-ink/50 mt-0.5">' + name + ' ' + stage + '단계 · ' + count + '개</div></div>';
-        }).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center col-span-2 tracking-stationery">태그를 모으면 꽃이 자랍니다.</p>';
+        }).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center col-span-2 tracking-stationery">Collect tags to grow flowers.</p>';
       }
 
       function escapeHtml(s) {
