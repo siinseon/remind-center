@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RE:MIND - 마음 재활용 센터</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            eco: '#4CAF50',
+            sky: '#2196F3',
+            bg: '#F9FBF9',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root { --eco: #4CAF50; --sky: #2196F3; --bg: #F9FBF9; }
+    body { background: var(--bg); max-width: 450px; margin: 0 auto; min-height: 100vh; }
+    .body-weather-period { background: repeating-linear-gradient(135deg, rgba(255,182,193,0.25) 0px, rgba(255,182,193,0.25) 8px, transparent 8px, transparent 16px), url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 2v4M10 14v4M6 6l2.8 2.8M11.2 11.2L14 14M2 10h4M14 10h4M6 14l2.8-2.8M11.2 8.8L14 6' stroke='%23999' fill='none' stroke-width='.5' opacity='.6'/%3E%3C/svg%3E"); }
+    @keyframes suck-in {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      70% { transform: translate(0, 180px) scale(0.4); opacity: 0.8; }
+      100% { transform: translate(0, 200px) scale(0); opacity: 0; }
+    }
+    @keyframes slide-up {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .animate-suck-in { animation: suck-in 0.55s ease-in forwards; }
+    .animate-slide-up { animation: slide-up 0.3s ease-out; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .dump-bin { position: relative; }
+    .dump-bin::before, .dump-bin::after { content: ''; position: absolute; bottom: -3px; width: 10px; height: 10px; background: #2E7D32; border-radius: 50%; border: 2px solid rgba(0,0,0,0.2); }
+    .dump-bin::before { left: 6px; }
+    .dump-bin::after { right: 6px; }
+  </style>
+</head>
+<body class="text-gray-800 antialiased pb-24">
+  <!-- Header: 오늘의 바디웨더 -->
+  <header id="header" class="sticky top-0 z-20 bg-bg/95 backdrop-blur border-b border-gray-200/80">
+    <div class="px-4 py-3 flex items-center justify-between">
+      <h1 class="text-lg font-semibold text-eco">RE:MIND</h1>
+      <button type="button" id="bodyWeatherBtn" class="text-sm text-sky rounded-full px-3 py-1 bg-sky/10 border border-transparent hover:border-sky/30">오늘의 바디웨더</button>
+    </div>
+  </header>
+
+  <main class="px-4 py-4 min-h-[60vh]">
+    <!-- Schedule -->
+    <section id="panel-schedule" class="tab-content active">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-eco">일정</h2>
+        <div class="flex gap-1 flex-wrap justify-end">
+          <button type="button" data-preset="연차" class="preset-btn text-xs px-2 py-1 rounded-full bg-sky/20 text-sky">연차</button>
+          <button type="button" data-preset="노래 수업" class="preset-btn text-xs px-2 py-1 rounded-full bg-sky/20 text-sky">노래 수업</button>
+        </div>
+      </div>
+      <div id="calendarWrap" class="mb-4"></div>
+      <div id="scheduleList" class="space-y-2"></div>
+    </section>
+
+    <!-- Diary -->
+    <section id="panel-diary" class="tab-content">
+      <h2 class="text-xl font-semibold text-eco mb-4">일기</h2>
+      <div id="diaryList" class="space-y-4"></div>
+    </section>
+
+    <!-- The Dump: placeholder (button is in tab bar) -->
+    <section id="panel-dump" class="tab-content">
+      <div class="text-center py-12 text-gray-500">
+        <p class="text-eco font-medium">아래 쓰레기통 버튼을 눌러</p>
+        <p>마음을 분리수거해 보세요.</p>
+      </div>
+    </section>
+
+    <!-- Memo -->
+    <section id="panel-memo" class="tab-content">
+      <h2 class="text-xl font-semibold text-eco mb-4">메모</h2>
+      <div id="memoByTag" class="space-y-4"></div>
+    </section>
+
+    <!-- Garden -->
+    <section id="panel-garden" class="tab-content">
+      <h2 class="text-xl font-semibold text-eco mb-4">가든</h2>
+      <div id="gardenGrid" class="grid grid-cols-2 gap-4"></div>
+    </section>
+  </main>
+
+  <!-- Bottom Tab Bar -->
+  <nav class="fixed bottom-0 left-0 right-0 max-w-[450px] mx-auto h-16 bg-white border-t border-gray-200 flex items-end justify-center gap-0 pb-2 z-30">
+    <button type="button" data-tab="schedule" class="tab-btn flex-1 flex flex-col items-center justify-center py-1 text-gray-500 data-[active=true]:text-eco">
+      <span class="text-lg">📅</span>
+      <span class="text-xs">일정</span>
+    </button>
+    <button type="button" data-tab="diary" class="tab-btn flex-1 flex flex-col items-center justify-center py-1 text-gray-500 data-[active=true]:text-eco">
+      <span class="text-lg">📔</span>
+      <span class="text-xs">일기</span>
+    </button>
+    <button type="button" id="dumpTrigger" class="dump-bin flex-shrink-0 -mt-6 w-16 h-16 rounded-full bg-eco shadow-lg flex items-center justify-center text-white text-2xl hover:scale-105 transition-transform border-4 border-eco/80" title="분리수거">🗑️</button>
+    <button type="button" data-tab="memo" class="tab-btn flex-1 flex flex-col items-center justify-center py-1 text-gray-500 data-[active=true]:text-eco">
+      <span class="text-lg">📌</span>
+      <span class="text-xs">메모</span>
+    </button>
+    <button type="button" data-tab="garden" class="tab-btn flex-1 flex flex-col items-center justify-center py-1 text-gray-500 data-[active=true]:text-eco">
+      <span class="text-lg">🌸</span>
+      <span class="text-xs">가든</span>
+    </button>
+  </nav>
+
+  <!-- The Dump Modal -->
+  <div id="dumpModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/40" data-close="dumpModal"></div>
+    <div class="absolute bottom-0 left-0 right-0 max-w-[450px] mx-auto bg-white rounded-t-2xl shadow-xl p-6 pb-10 animate-slide-up">
+      <h3 class="text-lg font-semibold text-eco mb-4">분리수거하기</h3>
+      <textarea id="dumpText" rows="4" class="w-full border border-gray-200 rounded-xl p-3 resize-none focus:ring-2 focus:ring-eco/50 outline-none" placeholder="내용, #태그, 시간(예: 15:00) 등을 입력하세요"></textarea>
+      <div class="mt-3 flex items-center gap-2">
+        <label class="text-sm text-gray-600">날짜·시간</label>
+        <input type="datetime-local" id="dumpDateTime" class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+      </div>
+      <div class="mt-3 flex items-center gap-2">
+        <label class="text-sm text-gray-600">반복</label>
+        <select id="dumpRecurring" class="border border-gray-200 rounded-lg px-3 py-2 text-sm">
+          <option value="">없음</option>
+          <option value="weekly">매주</option>
+          <option value="monthly">매월</option>
+        </select>
+      </div>
+      <div class="mt-3">
+        <label class="block text-sm text-gray-600 mb-1">사진 (선택)</label>
+        <input type="file" id="dumpImage" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-eco/20 file:text-eco" />
+      </div>
+      <button type="button" id="dumpSubmit" class="mt-4 w-full py-3 rounded-xl bg-eco text-white font-medium hover:bg-eco/90">슈슉– 넣기</button>
+    </div>
+  </div>
+
+  <!-- Suck-in overlay (for animation) -->
+  <div id="suckOverlay" class="fixed inset-0 z-[60] pointer-events-none hidden items-center justify-center bg-black/20">
+    <div id="suckCard" class="absolute w-20 h-20 rounded-xl bg-eco/90 flex items-center justify-center text-white text-3xl shadow-xl" style="top: 50%; left: 50%; margin: -40px 0 0 -40px;"></div>
+  </div>
+
+  <script>
+    (function () {
+      const STORAGE_KEYS = {
+        schedules: 'remind_schedules',
+        diaries: 'remind_diaries',
+        memos: 'remind_memos',
+        gardenTags: 'remind_garden_tags',
+        periodDates: 'remind_period_dates',
+      };
+
+      let schedules = JSON.parse(localStorage.getItem(STORAGE_KEYS.schedules) || '[]');
+      let diaries = JSON.parse(localStorage.getItem(STORAGE_KEYS.diaries) || '[]');
+      let memos = JSON.parse(localStorage.getItem(STORAGE_KEYS.memos) || '[]');
+      let gardenTags = JSON.parse(localStorage.getItem(STORAGE_KEYS.gardenTags) || '{}');
+      let periodDates = JSON.parse(localStorage.getItem(STORAGE_KEYS.periodDates) || '[]');
+
+      function save() {
+        localStorage.setItem(STORAGE_KEYS.schedules, JSON.stringify(schedules));
+        localStorage.setItem(STORAGE_KEYS.diaries, JSON.stringify(diaries));
+        localStorage.setItem(STORAGE_KEYS.memos, JSON.stringify(memos));
+        localStorage.setItem(STORAGE_KEYS.gardenTags, JSON.stringify(gardenTags));
+        localStorage.setItem(STORAGE_KEYS.periodDates, JSON.stringify(periodDates));
+      }
+
+      function id() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+      // ---------- Body Weather ----------
+      function isPeriodDay(dateStr) {
+        return periodDates.some(d => d === dateStr);
+      }
+      function updateBodyWeatherHeader() {
+        const today = formatDateOnly(new Date());
+        const header = document.getElementById('header');
+        const label = document.getElementById('bodyWeatherBtn');
+        if (isPeriodDay(today)) {
+          header.classList.add('body-weather-period');
+          label.textContent = '구름/빗방울';
+        } else {
+          header.classList.remove('body-weather-period');
+          label.textContent = '오늘의 바디웨더';
+        }
+      }
+      document.getElementById('bodyWeatherBtn').addEventListener('click', () => {
+        const today = formatDateOnly(new Date());
+        const idx = periodDates.indexOf(today);
+        if (idx >= 0) periodDates.splice(idx, 1);
+        else periodDates.push(today);
+        periodDates.sort();
+        save();
+        updateBodyWeatherHeader();
+      });
+      function formatDateOnly(d) {
+        const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      }
+      function parseTimeFromText(text) {
+        const m = text.match(/(\d{1,2}):(\d{2})/);
+        return m ? { hours: parseInt(m[1], 10), minutes: parseInt(m[2], 10) } : null;
+      }
+      function extractTags(text) {
+        const matches = text.match(/#[\w가-힣]+/g) || [];
+        return [...new Set(matches.map(t => t.slice(1)))];
+      }
+
+      // ---------- Tabs ----------
+      let currentTab = 'schedule';
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentTab = btn.dataset.tab;
+          document.querySelectorAll('.tab-btn').forEach(b => b.dataset.active = b.dataset.tab === currentTab ? 'true' : 'false');
+          document.querySelectorAll('.tab-content').forEach(p => { p.classList.toggle('active', p.id === 'panel-' + currentTab); });
+          renderAll();
+        });
+      });
+      document.querySelector('[data-tab="schedule"]').dataset.active = 'true';
+
+      // ---------- Dump Modal ----------
+      const dumpModal = document.getElementById('dumpModal');
+      const dumpTrigger = document.getElementById('dumpTrigger');
+      const dumpSubmit = document.getElementById('dumpSubmit');
+      const dumpText = document.getElementById('dumpText');
+      const dumpDateTime = document.getElementById('dumpDateTime');
+      const dumpRecurring = document.getElementById('dumpRecurring');
+      const dumpImage = document.getElementById('dumpImage');
+      const suckOverlay = document.getElementById('suckOverlay');
+      const suckTarget = document.getElementById('suckTarget');
+
+      dumpTrigger.addEventListener('click', () => {
+        dumpModal.classList.remove('hidden');
+        dumpModal.classList.add('flex');
+        dumpText.value = '';
+        dumpDateTime.value = '';
+        dumpRecurring.value = '';
+        dumpImage.value = '';
+      });
+      dumpModal.querySelector('[data-close="dumpModal"]').addEventListener('click', () => {
+        dumpModal.classList.add('hidden');
+        dumpModal.classList.remove('flex');
+      });
+
+      function playSuckAnimation(callback) {
+        const card = document.getElementById('suckCard');
+        card.textContent = '📄';
+        card.className = 'absolute w-20 h-20 rounded-xl bg-eco/90 flex items-center justify-center text-white text-3xl shadow-xl animate-suck-in';
+        card.style.cssText = 'top: 50%; left: 50%; margin: -40px 0 0 -40px;';
+        suckOverlay.classList.remove('hidden');
+        suckOverlay.classList.add('flex');
+        setTimeout(() => {
+          card.className = 'absolute w-20 h-20 rounded-xl bg-eco/90 flex items-center justify-center text-white text-3xl shadow-xl';
+          card.textContent = '';
+          card.style.cssText = '';
+          suckOverlay.classList.add('hidden');
+          suckOverlay.classList.remove('flex');
+          if (callback) callback();
+        }, 580);
+      }
+
+      dumpSubmit.addEventListener('click', async () => {
+        const text = dumpText.value.trim();
+        const dateTimeVal = dumpDateTime.value;
+        const recurring = dumpRecurring.value;
+        const tags = extractTags(text);
+        const timeInText = parseTimeFromText(text);
+        const hasLongText = text.length > 80;
+        let imageBase64 = null;
+        if (dumpImage.files && dumpImage.files[0]) {
+          imageBase64 = await new Promise((res) => {
+            const r = new FileReader();
+            r.onload = () => res(r.result);
+            r.readAsDataURL(dumpImage.files[0]);
+          });
+        }
+        const hasPhoto = !!imageBase64;
+
+        const dateForSchedule = dateTimeVal ? new Date(dateTimeVal) : new Date();
+        const dateStr = formatDateOnly(dateForSchedule);
+        const timeStr = dateTimeVal ? dateTimeVal.slice(11, 16) : (timeInText ? `${String(timeInText.hours).padStart(2,'0')}:${String(timeInText.minutes).padStart(2,'0')}` : null);
+
+        if (dateStr && (timeStr || recurring)) {
+          const title = text.replace(/#[\w가-힣]+/g, '').replace(/\d{1,2}:\d{2}/g, '').trim() || '일정';
+          schedules.push({
+            id: id(),
+            title,
+            date: dateStr,
+            time: timeStr || null,
+            recurring: recurring || null,
+            preset: null,
+            createdAt: new Date().toISOString(),
+          });
+          if (recurring === 'weekly' || recurring === 'monthly') {
+            const base = new Date(dateForSchedule);
+            for (let i = 1; i <= 12; i++) {
+              const next = new Date(base);
+              if (recurring === 'weekly') next.setDate(next.getDate() + 7 * i);
+              else next.setMonth(next.getMonth() + i);
+              schedules.push({
+                id: id(),
+                title,
+                date: formatDateOnly(next),
+                time: timeStr,
+                recurring,
+                preset: null,
+                createdAt: new Date().toISOString(),
+              });
+            }
+          }
+        }
+        if (hasPhoto || hasLongText) {
+          diaries.push({
+            id: id(),
+            content: text,
+            imageBase64: imageBase64 || null,
+            createdAt: new Date().toISOString(),
+          });
+        }
+        if (tags.length) {
+          const memoId = id();
+          memos.push({ id: memoId, content: text, tags, createdAt: new Date().toISOString() });
+          tags.forEach(t => { gardenTags[t] = (gardenTags[t] || 0) + 1; });
+        }
+        save();
+        playSuckAnimation(() => {
+          dumpModal.classList.add('hidden');
+          dumpModal.classList.remove('flex');
+          renderAll();
+        });
+      });
+
+      // ---------- Presets (Schedule) ----------
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const title = btn.dataset.preset;
+          const today = formatDateOnly(new Date());
+          schedules.push({ id: id(), title, date: today, time: null, recurring: null, preset: title, createdAt: new Date().toISOString() });
+          save();
+          renderAll();
+        });
+      });
+
+      // ---------- Calendar (Monday start) ----------
+      const WEEKDAYS = ['월','화','수','목','금','토','일'];
+      const SAT = 6, SUN = 0;
+      function getMonthDays(year, month) {
+        const first = new Date(year, month, 1);
+        const last = new Date(year, month + 1, 0);
+        const startDow = first.getDay();
+        const monStart = startDow === 0 ? 6 : startDow - 1;
+        const days = [];
+        for (let i = 0; i < monStart; i++) days.push(null);
+        for (let d = 1; d <= last.getDate(); d++) days.push(d);
+        return days;
+      }
+      function getDayOfWeek(year, month, day) {
+        return new Date(year, month, day - 1).getDay();
+      }
+      function isHoliday(dateStr) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const dow = new Date(y, m - 1, d).getDay();
+        return dow === SUN || dow === SAT;
+      }
+
+      function renderCalendar() {
+        const now = new Date();
+        let year = now.getFullYear(), month = now.getMonth();
+        const wrap = document.getElementById('calendarWrap');
+        const days = getMonthDays(year, month);
+        const monthLabel = `${year}년 ${month + 1}월`;
+        let html = '<div class="flex justify-between items-center mb-2"><span class="font-medium text-eco">' + monthLabel + '</span></div>';
+        html += '<div class="grid grid-cols-7 gap-1 text-center text-xs mb-2">';
+        WEEKDAYS.forEach(w => { html += '<div class="font-medium ' + (w === '토' ? 'text-sky' : w === '일' ? 'text-red-500' : 'text-gray-600') + '">' + w + '</div>'; });
+        html += '</div><div class="grid grid-cols-7 gap-1 text-sm">';
+        days.forEach((d, i) => {
+          if (d === null) { html += '<div></div>'; return; }
+          const dow = getDayOfWeek(year, month, d);
+          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          const isSat = dow === SAT, isSun = dow === SUN;
+          const dayClass = isSun ? 'text-red-500' : isSat ? 'text-sky' : '';
+          const periodClass = isPeriodDay(dateStr) ? ' body-weather-period rounded' : '';
+          const count = schedules.filter(s => s.date === dateStr).length;
+          html += '<div class="py-1 rounded ' + dayClass + periodClass + '" data-date="' + dateStr + '">' + d + (count ? ' <span class="text-eco text-xs">' + count + '</span>' : '') + '</div>';
+        });
+        html += '</div>';
+        wrap.innerHTML = html;
+      }
+
+      function renderScheduleList() {
+        const list = document.getElementById('scheduleList');
+        const today = formatDateOnly(new Date());
+        const relevant = schedules.filter(s => s.date >= today).sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
+        list.innerHTML = relevant.slice(0, 30).map(s => 
+          '<div class="flex items-center gap-2 py-2 border-b border-gray-100"><span class="text-eco font-medium">' + s.date + (s.time ? ' ' + s.time : '') + '</span><span>' + escapeHtml(s.title) + '</span></div>'
+        ).join('') || '<p class="text-gray-500 text-sm">등록된 일정이 없습니다.</p>';
+      }
+
+      function renderDiary() {
+        const list = document.getElementById('diaryList');
+        const sorted = [...diaries].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        list.innerHTML = sorted.map(d => {
+          const date = new Date(d.createdAt);
+          const dateStr = date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+          let block = '<div class="border border-gray-200 rounded-xl p-4 bg-white"><div class="text-xs text-gray-500 mb-2">' + dateStr + '</div>';
+          if (d.imageBase64) block += '<img src="' + d.imageBase64 + '" alt="" class="w-full rounded-lg mb-2 max-h-48 object-cover" />';
+          block += '<p class="text-gray-800 whitespace-pre-wrap">' + escapeHtml(d.content || '') + '</p></div>';
+          return block;
+        }).join('') || '<p class="text-gray-500 text-sm">일기가 없습니다.</p>';
+      }
+
+      function renderMemo() {
+        const byTag = {};
+        memos.forEach(m => {
+          m.tags.forEach(t => {
+            if (!byTag[t]) byTag[t] = [];
+            byTag[t].push(m);
+          });
+        });
+        const container = document.getElementById('memoByTag');
+        const tags = Object.keys(byTag).sort();
+        container.innerHTML = tags.map(tag =>
+          '<div class="rounded-xl border border-gray-200 p-4 bg-white"><h4 class="text-eco font-medium mb-2">#' + escapeHtml(tag) + '</h4><ul class="space-y-2">' +
+          byTag[tag].map(m => '<li class="text-sm text-gray-700">' + escapeHtml(m.content.slice(0, 120) + (m.content.length > 120 ? '…' : '')) + '</li>').join('') +
+          '</ul></div>'
+        ).join('') || '<p class="text-gray-500 text-sm">#태그 메모가 없습니다.</p>';
+      }
+
+      function growthStage(count) {
+        if (count >= 10) return 4;
+        if (count >= 5) return 3;
+        if (count >= 2) return 2;
+        return 1;
+      }
+      const COSMOS = ['🌱','🌿','🌻','🌸'];
+      const LILY = ['🌱','🍃','💐','✨'];
+      function renderGarden() {
+        const grid = document.getElementById('gardenGrid');
+        const entries = Object.entries(gardenTags).map(([tag, count]) => ({ tag, count, stage: growthStage(count) }));
+        entries.sort((a, b) => b.count - a.count);
+        grid.innerHTML = entries.map(({ tag, count, stage }) => {
+          const useCosmos = tag.length % 2 === 0;
+          const icons = useCosmos ? COSMOS : LILY;
+          const name = useCosmos ? '코스모스' : '은방울꽃';
+          return '<div class="rounded-xl border border-eco/30 p-4 bg-white text-center"><div class="text-3xl mb-1">' + icons[stage - 1] + '</div><div class="text-eco font-medium">#' + escapeHtml(tag) + '</div><div class="text-xs text-gray-500">' + name + ' ' + stage + '단계</div><div class="text-xs text-gray-400">' + count + '개</div></div>';
+        }).join('') || '<p class="text-gray-500 text-sm col-span-2">태그를 모으면 꽃이 자랍니다.</p>';
+      }
+
+      function escapeHtml(s) {
+        const div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function renderAll() {
+        updateBodyWeatherHeader();
+        renderCalendar();
+        renderScheduleList();
+        renderDiary();
+        renderMemo();
+        renderGarden();
+      }
+
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
