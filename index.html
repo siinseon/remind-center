@@ -310,6 +310,10 @@
         <input type="file" id="dumpBulkImages" accept="image/*" multiple class="w-full text-[#C0C0C0] text-xs file:metal-magnet file:chrome-molding file:px-2 file:py-1 file:text-black file:text-xs" />
         <p class="text-[#808080] text-[10px] content-font mt-0.5">사진 여러 장 선택 시, 촬영·캡처 날짜에 맞춰 그날 일기에 들어갑니다.</p>
       </div>
+      <div class="mt-2 flex items-center gap-2">
+        <input type="checkbox" id="dumpShowInArchive" checked class="rounded border-[#808080] bg-[#4A5568] text-[#CCFF00] focus:ring-0" />
+        <label for="dumpShowInArchive" class="text-[#C0C0C0] text-xs content-font">아카이브에 보이기</label>
+      </div>
     </div>
     <div class="flex-shrink-0 flex flex-col items-center pb-8">
       <button type="button" id="dumpSubmit" class="w-full max-w-[280px] py-3 neon-lime font-impact text-black text-center">버리기</button>
@@ -601,6 +605,8 @@
     const targetDateStr = parseDateInText(text) || (dumpDateInput && dumpDateInput.value) || dumpSelectedDateStr || today;
     const day = ensureDate(targetDateStr);
 
+    const showInArchiveEl = document.getElementById('dumpShowInArchive');
+    const showArchive = showInArchiveEl ? showInArchiveEl.checked : true;
     const bulkInput = document.getElementById('dumpBulkImages');
     if (bulkInput && bulkInput.files && bulkInput.files.length > 0) {
       for (let i = 0; i < bulkInput.files.length; i++) {
@@ -609,7 +615,7 @@
         const imageBase64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(file); });
         const dayForPhoto = ensureDate(dateStr);
         dayForPhoto.diary = dayForPhoto.diary || [];
-        dayForPhoto.diary.push({ id: id(), content: '', imageBase64, createdAt: new Date().toISOString() });
+        dayForPhoto.diary.push({ id: id(), content: '', imageBase64, createdAt: new Date().toISOString(), showInArchive: showArchive });
       }
       bulkInput.value = '';
     }
@@ -625,7 +631,7 @@
       imageBase64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(dumpImage.files[0]); });
     }
     if (text || imageBase64) {
-      day.diary.push({ id: id(), content: text || '', imageBase64, createdAt: new Date().toISOString() });
+      day.diary.push({ id: id(), content: text || '', imageBase64, createdAt: new Date().toISOString(), showInArchive: showArchive });
     }
 
     const tags = extractTags(text);
@@ -960,7 +966,9 @@
     const hintEl = document.getElementById('archiveHint');
     const allDiary = [];
     Object.entries(remindData).forEach(([dateStr, day]) => {
-      (day.diary || []).forEach(d => allDiary.push({ ...d, dateStr }));
+      (day.diary || []).forEach(d => {
+        if (d.showInArchive !== false) allDiary.push({ ...d, dateStr });
+      });
     });
     allDiary.sort((a,b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
     if (allDiary.length === 0) {
@@ -982,9 +990,9 @@
       const top = saved ? saved.y : 20 + i * stepY;
       const rot = (i % 3) * 4 - 4;
       if (d.imageBase64) {
-        html += '<div class="archive-card absolute rounded-lg chrome-molding overflow-hidden bg-white filter drop-shadow content-font cursor-grab active:cursor-grabbing select-none touch-none" data-id="' + escapeHtml(did) + '" style="left:' + left + 'px;top:' + top + 'px;width:' + cardWidth + 'px;transform:rotate(' + rot + 'deg);z-index:1"><img src="' + d.imageBase64 + '" alt="" class="w-full h-28 object-cover pointer-events-none"/><div class="p-1 text-[10px] text-black truncate pointer-events-none">' + escapeHtml((d.content || '').slice(0,20)) + '</div></div>';
+        html += '<div class="archive-card absolute rounded-lg chrome-molding overflow-hidden bg-white filter drop-shadow content-font cursor-grab active:cursor-grabbing select-none touch-none" data-id="' + escapeHtml(did) + '" style="left:' + left + 'px;top:' + top + 'px;width:' + cardWidth + 'px;transform:rotate(' + rot + 'deg);z-index:1"><button type="button" class="archive-hide-btn absolute top-0.5 right-0.5 z-10 w-5 h-5 rounded metal-magnet chrome-molding text-[9px] leading-none text-black hover:bg-red-500 hover:text-white" title="아카이브에서 숨기기">×</button><img src="' + d.imageBase64 + '" alt="" class="w-full h-28 object-cover pointer-events-none"/><div class="p-1 text-[10px] text-black truncate pointer-events-none">' + escapeHtml((d.content || '').slice(0,20)) + '</div></div>';
       } else {
-        html += '<div class="archive-card absolute rounded chrome-molding p-2 metal-plate text-black text-xs overflow-hidden filter drop-shadow content-font cursor-grab active:cursor-grabbing select-none touch-none" data-id="' + escapeHtml(did) + '" style="left:' + left + 'px;top:' + top + 'px;width:100px;min-height:60px;transform:rotate(' + rot + 'deg);z-index:1">' + escapeHtml((d.content || '').slice(0, 50)) + (d.content && d.content.length > 50 ? '…' : '') + '</div>';
+        html += '<div class="archive-card absolute rounded chrome-molding p-2 metal-plate text-black text-xs overflow-hidden filter drop-shadow content-font cursor-grab active:cursor-grabbing select-none touch-none" data-id="' + escapeHtml(did) + '" style="left:' + left + 'px;top:' + top + 'px;width:100px;min-height:60px;transform:rotate(' + rot + 'deg);z-index:1"><button type="button" class="archive-hide-btn absolute top-0.5 right-0.5 z-10 w-5 h-5 rounded metal-magnet chrome-molding text-[9px] leading-none text-black hover:bg-red-500 hover:text-white" title="아카이브에서 숨기기">×</button>' + escapeHtml((d.content || '').slice(0, 50)) + (d.content && d.content.length > 50 ? '…' : '') + '</div>';
       }
     });
     stack.innerHTML = html;
@@ -1030,6 +1038,20 @@
       }
       card.addEventListener('mousedown', onStart);
       card.addEventListener('touchstart', onStart, { passive: false });
+    });
+    stack.querySelectorAll('.archive-hide-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const did = btn.closest('.archive-card')?.dataset?.id;
+        if (!did) return;
+        for (const [, day] of Object.entries(remindData)) {
+          const entry = (day.diary || []).find(d => (d.id || '') === did);
+          if (entry) { entry.showInArchive = false; break; }
+        }
+        save();
+        renderArchive();
+      });
     });
   }
 
