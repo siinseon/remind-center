@@ -4,22 +4,50 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>RE:MIND - 마음 재활용 센터</title>
+  <style>
+    @font-face {
+      font-family: 'RoundedFixedsys';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+      font-weight: normal;
+      font-display: swap;
+    }
+    /* 물마루 (제목, 달력 숫자, 큰 글씨) - 눈누 https://noonnu.cc/font_page/1763 */
+    @font-face {
+      font-family: 'Mulmaru';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2601-4@1.1/Mulmaru.woff2') format('woff2');
+      font-weight: normal;
+      font-display: swap;
+    }
+    /* 탕바 = 사용자 입력·작은 글씨 (눈누 https://noonnu.cc/font_page/1768 ) */
+    @font-face {
+      font-family: 'Tangba';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2601-4@1.1/Tangba12.woff2') format('woff2');
+      font-weight: normal;
+      font-display: swap;
+    }
+    .font-tangba { font-family: 'Tangba', sans-serif; }
+  </style>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            paper: '#F9F9F7',
-            ink: '#111827',
-            emerald: { DEFAULT: '#059669', light: '#10B981', soft: '#D1FAE5' },
-            sky: { DEFAULT: '#0EA5E9', soft: '#E0F2FE' },
+            silver: '#C0C0C0',
+            'dark-steel': '#4A5568',
+            'acid-lime': '#CCFF00',
+            'hot-pink': '#FF0099',
+            'retro-blue': '#0033CC',
           },
-          letterSpacing: { stationery: '-0.5px' },
+          fontFamily: {
+            app: ['RoundedFixedsys', 'Fixedsys', 'Consolas', 'monospace'],
+            impact: ['Mulmaru', 'RoundedFixedsys', 'Fixedsys', 'Consolas', 'monospace'],
+            mulmaru: ['Mulmaru', 'Maru Buri', 'serif'],
+            tangba: ['Tangba', 'sans-serif'],
+          },
           boxShadow: {
-            'soft': '0 2px 8px rgba(0,0,0,0.06)',
-            'soft-lg': '0 4px 20px rgba(0,0,0,0.08)',
-            'glow': '0 0 24px rgba(5, 150, 105, 0.35)',
+            'hard': '2px 2px 0 0 #000',
+            'hard-lg': '4px 4px 0 0 #000',
           }
         }
       }
@@ -27,521 +55,1124 @@
   </script>
   <style>
     :root {
-      --paper: #F9F9F7;
-      --ink: #111827;
-      --emerald: #059669;
-      --emerald-light: #10B981;
+      --silver: #C0C0C0;
+      --dark-steel: #4A5568;
+      --acid-lime: #CCFF00;
+      --hot-pink: #FF0099;
+      --electric-blue: #0033CC;
     }
     * { -webkit-tap-highlight-color: transparent; }
     html { overscroll-behavior: none; }
     body {
-      background: var(--paper);
-      color: var(--ink);
-      width: 100%;
+      background-color: #C0C0C0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.08) 100%),
+        linear-gradient(180deg, #d0d0d0 0%, #C0C0C0 50%, #a8a8a8 100%);
+      color: #000;
+      font-family: 'RoundedFixedsys', Fixedsys, Consolas, monospace;
+      font-weight: normal;
       max-width: 450px;
       margin: 0 auto;
       min-height: 100dvh;
-      min-height: 100vh;
-      letter-spacing: -0.5px;
+      text-shadow: 0 0 1px rgba(0,0,0,0.3);
     }
-    @media (min-width: 640px) {
-      body {
-        max-width: 480px;
-        min-height: 640px;
-        box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.08);
-      }
+    .chrome-molding {
+      border: 2px solid #000;
+      box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), inset -1px -1px 0 rgba(0,0,0,0.5);
     }
-    @supports (padding: env(safe-area-inset-bottom)) {
-      body { padding-bottom: env(safe-area-inset-bottom); }
+    .chrome-molding-outer {
+      border: 2px solid #000;
+      box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), inset -1px -1px 0 rgba(0,0,0,0.5), 2px 2px 0 #000;
     }
-    .body-weather-period {
-      background: repeating-linear-gradient(135deg, rgba(255,182,193,0.2) 0px, rgba(255,182,193,0.2) 8px, transparent 8px, transparent 16px),
-        url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 2v4M10 14v4M6 6l2.8 2.8M11.2 11.2L14 14M2 10h4M14 10h4M6 14l2.8-2.8M11.2 8.8L14 6' stroke='%23999' fill='none' stroke-width='.5' opacity='.5'/%3E%3C/svg%3E");
+    .metal-plate {
+      background: linear-gradient(145deg, #b8b8b8 0%, #C0C0C0 30%, #a0a0a0 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
     }
-    @keyframes suck-in {
-      0% { transform: translate(0, 0) scale(1); opacity: 1; }
-      70% { transform: translate(0, 180px) scale(0.4); opacity: 0.8; }
-      100% { transform: translate(0, 200px) scale(0); opacity: 0; }
+    .metal-engraved {
+      background: linear-gradient(145deg, #606870 0%, #4A5568 50%, #3d4652 100%);
+      color: #b0b0b0;
+      box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
     }
-    @keyframes slide-up {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
+    .metal-magnet {
+      background: linear-gradient(145deg, #d0d0d0 0%, #C0C0C0 50%, #a0a0a0 100%);
+      box-shadow: inset 1px 1px 0 rgba(255,255,255,0.6), 2px 2px 0 rgba(0,0,0,0.4);
     }
-    @keyframes bin-rise {
-      from { transform: translateY(100%) scale(0.8); opacity: 0; }
-      to { transform: translateY(0) scale(1); opacity: 1; }
+    .neon-lime {
+      background: #CCFF00;
+      color: #000;
+      border: 2px solid #000;
+      box-shadow: 0 0 0 2px #000, 2px 2px 0 #000;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
     }
-    @keyframes paper-suck {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      50% { transform: translateY(35dvh) scale(0.5); opacity: 1; }
-      100% { transform: translateY(55dvh) scale(0.08); opacity: 0; }
+    .neon-pink {
+      background: #FF0099;
+      color: #fff;
+      border: 2px solid #000;
+      box-shadow: 0 0 0 2px #000;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
     }
-    .animate-suck-in { animation: suck-in 0.55s ease-in forwards; }
-    .animate-slide-up { animation: slide-up 0.3s ease-out; }
-    .animate-bin-rise { animation: bin-rise 0.5s ease-out forwards; }
-    .animate-paper-suck { animation: paper-suck 0.6s ease-in forwards; }
-    body.dump-modal-open #tabBar { visibility: hidden; pointer-events: none; }
-    .dump-throw-btn { opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
-    .dump-throw-btn.throw-visible { opacity: 1; pointer-events: auto; }
+    .neon-lime-text { color: #CCFF00; text-shadow: 0 0 0 2px #000, 0 0 0 3px #000, 0 1px 2px #000; }
+    .body-weather-tape {
+      background: repeating-linear-gradient(-45deg, #FF0099 0px, #FF0099 6px, #000 6px, #000 12px);
+      border: 2px solid #000;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 2px 2px 0 #000;
+    }
+    .period-day-pink { background: #FF0099; color: #fff; border: 2px solid #000; box-shadow: 2px 2px 0 #000; }
+    .period-phase-pms { background: #00CCFF; color: #000; }
+    .period-phase-golden { background: #CCFF00; color: #000; }
+    .calendar-board {
+      background: linear-gradient(160deg, #c8c8c8 0%, #C0C0C0 40%, #a8a8a8 100%);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 3px 3px 0 #000;
+    }
+    .sticker-vinyl {
+      background: linear-gradient(145deg, #e8ff9e 0%, #CCFF00 50%, #aacc00 100%);
+      border: 2px solid #000;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.5), 2px 2px 0 #000;
+      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.4));
+    }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    .dump-bin {
-      position: relative;
-      box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.4);
-      transition: box-shadow 0.3s ease, transform 0.2s ease;
+    .steel-beam {
+      background: linear-gradient(180deg, #8a8a8a 0%, #6a6a6a 50%, #5a5a5a 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 -2px 4px rgba(0,0,0,0.3);
     }
-    .dump-bin:hover, .dump-bin:focus-visible {
-      box-shadow: 0 0 28px rgba(5, 150, 105, 0.4), 0 4px 14px rgba(0,0,0,0.12);
-      transform: scale(1.05);
+    .btn-mechanical {
+      transition: transform 0.05s ease, box-shadow 0.05s ease;
     }
+    .btn-mechanical:active, .tab-btn[data-active="true"].btn-mechanical {
+      transform: translateY(2px);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .tab-btn[data-active="true"] { font-weight: 900; background: #CCFF00 !important; border-color: #000; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.5), 2px 2px 0 #000; }
+    @keyframes swing { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+    .keyring-swing { animation: swing 2s ease-in-out infinite; }
+    @keyframes bin-rise { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .animate-bin-rise { animation: bin-rise 0.4s ease-out forwards; }
+    @keyframes paper-suck { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(60vh) scale(0.1); opacity: 0; } }
+    .animate-paper-suck { animation: paper-suck 0.5s ease-in forwards; }
+    .chrome-bin-svg { filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(255,255,255,0.3); }
+    body.dump-modal-open #tabBar { visibility: hidden; pointer-events: none; }
+    .sticker-hologram { filter: drop-shadow(0 0 6px rgba(204,255,0,0.9)) drop-shadow(0 0 0 1px #000); }
+    .keyring-chain { background: linear-gradient(90deg, #888 0%, #aaa 50%, #888 100%); height: 4px; border-radius: 2px; }
+    .nav-icon-svg { filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5)) drop-shadow(0 1px 3px rgba(0,0,0,0.35)); }
+    .calendar-header-date { font-family: 'Mulmaru', 'Maru Buri', serif; font-weight: normal; letter-spacing: 0.05em; }
+    .calendar-schedule-label { font-family: 'Tangba', sans-serif; font-size: 10px; font-weight: normal; line-height: 1.25; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; display: block; letter-spacing: 0.02em; transform: scale(0.5); transform-origin: left center; }
+    .calendar-cell.neon-lime .calendar-schedule-label { color: #000; }
+    .calendar-cell.body-weather-tape .calendar-schedule-label,
+    .calendar-cell.period-day-pink .calendar-schedule-label { color: #fff; }
+    .content-font, .user-text { font-family: 'Tangba', sans-serif; font-weight: normal; }
+    .memo-body { font-family: 'Tangba', sans-serif; font-size: 13px; font-weight: normal; line-height: 1.5; color: #b0b0b0; transform: scale(0.7); transform-origin: top left; }
   </style>
 </head>
-<body class="antialiased pb-28 overscroll-none">
-  <!-- Header: Glassmorphism -->
-  <header id="header" class="sticky top-0 z-20 bg-transparent backdrop-blur-md">
-    <div class="px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
-      <h1 class="text-[22px] sm:text-[24px] font-bold text-emerald tracking-stationery">RE:MIND</h1>
-      <button type="button" id="bodyWeatherBtn" class="text-xs sm:text-sm font-medium text-sky rounded-full px-3 py-1.5 sm:px-4 sm:py-2 bg-sky/10 shadow-soft hover:bg-sky/15 transition-colors tracking-stationery">오늘의 바디웨더</button>
+<body class="antialiased pb-24">
+  <header class="sticky top-0 z-20 metal-plate chrome-molding-outer border-t-0 border-l-0 border-r-0">
+    <div class="px-4 py-2 flex items-center justify-between">
+      <h1 class="text-xl font-impact text-black tracking-tight" style="text-shadow: 0 0 0 1px #0033CC, 0 1px 0 #000, 2px 2px 4px rgba(0,0,0,0.4), 3px 3px 6px rgba(0,0,0,0.3);">RE:MIND</h1>
+      <button type="button" id="bodyWeatherBtn" class="text-xs px-3 py-1 metal-magnet chrome-molding btn-mechanical font-impact" style="color:#FF0040;text-shadow:0 0 4px #FF0040,0 0 0 1px #000,0 1px 0 #000,2px 2px 4px rgba(0,0,0,0.4),3px 3px 6px rgba(0,0,0,0.3);">SYSTEM ERROR</button>
     </div>
   </header>
 
-  <main class="px-4 py-4 sm:px-6 sm:py-5 min-h-[60vh]">
-    <!-- Schedule -->
-    <section id="panel-schedule" class="tab-content active">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-[20px] sm:text-[24px] font-bold text-ink tracking-stationery">Calendar</h2>
-        <div class="flex gap-2 flex-wrap justify-end">
-          <button type="button" data-preset="연차" class="preset-btn text-sm font-medium px-3 py-2 rounded-2xl bg-emerald-soft text-emerald shadow-soft hover:shadow-soft-lg transition-shadow tracking-stationery">연차</button>
-          <button type="button" data-preset="노래 수업" class="preset-btn text-sm font-medium px-3 py-2 rounded-2xl bg-emerald-soft text-emerald shadow-soft hover:shadow-soft-lg transition-shadow tracking-stationery">노래 수업</button>
-        </div>
+  <main class="px-3 py-4 min-h-[60vh]">
+    <!-- Calendar: Metal Poster Board -->
+    <section id="panel-calendar" class="tab-content active">
+      <div id="calendarPoster" class="calendar-board chrome-molding-outer p-4 mb-4 text-center">
+        <div id="calendarHeader" class="calendar-header-date text-4xl sm:text-5xl text-[#4A5568]" style="text-shadow: 2px 2px 0 rgba(0,0,0,0.2);">2026-2-18</div>
       </div>
-      <div id="calendarWrap" class="mb-6"></div>
-      <div id="scheduleList" class="space-y-1"></div>
+      <div id="calendarGrid" class="grid grid-cols-7 gap-2 sm:gap-3"></div>
+      <div id="scheduleList" class="mt-4 space-y-2"></div>
     </section>
 
-    <!-- Diary -->
-    <section id="panel-diary" class="tab-content">
-      <h2 class="text-[20px] sm:text-[24px] font-bold text-ink tracking-stationery mb-5">Archive</h2>
-      <div id="diaryList" class="space-y-5"></div>
+    <!-- Archive: Physical Stack -->
+    <section id="panel-archive" class="tab-content">
+      <h2 class="text-2xl font-impact font-bold chrome-molding-outer metal-plate p-2 mb-4 text-center text-black" style="border-color:#FF0099;">ARCHIVE</h2>
+      <p id="archiveHint" class="text-[#808080] text-xs content-font mb-2 hidden">드래그해서 위치 조정 가능</p>
+      <div id="archiveStack" class="min-h-[40vh] relative pb-4"></div>
     </section>
 
-    <!-- The Dump -->
+    <!-- The Dump placeholder -->
     <section id="panel-dump" class="tab-content">
-      <div class="text-center py-16 text-ink/60">
-        <p class="text-[18px] font-semibold text-emerald tracking-stationery">아래 쓰레기통 버튼을 눌러</p>
-        <p class="text-[15px] mt-1 tracking-stationery">마음을 분리수거해 보세요.</p>
+      <div class="metal-engraved chrome-molding p-8 text-center text-[#b0b0b0]">
+        <p class="font-impact text-[#C0C0C0]">TAP THE BIN BELOW</p>
+        <p class="text-sm mt-2">Throw it in. We sort it.</p>
       </div>
     </section>
 
     <!-- Memo -->
     <section id="panel-memo" class="tab-content">
-      <h2 class="text-[20px] sm:text-[24px] font-bold text-ink tracking-stationery mb-5">Memo</h2>
-      <div id="memoByTag" class="space-y-5"></div>
+      <h2 class="text-2xl font-impact font-bold chrome-molding-outer metal-plate p-2 mb-4 text-center text-black" style="border-color:#FF0099;">MEMO</h2>
+      <div id="memoByTag" class="space-y-3"></div>
     </section>
 
-    <!-- Garden -->
-    <section id="panel-garden" class="tab-content">
-      <h2 class="text-[20px] sm:text-[24px] font-bold text-ink tracking-stationery mb-5">Garden</h2>
-      <div id="gardenGrid" class="grid grid-cols-2 gap-4"></div>
+    <!-- Deco (Bin Deco / Stickers) -->
+    <section id="panel-deco" class="tab-content">
+      <h2 class="text-2xl font-impact font-bold chrome-molding-outer metal-plate p-2 mb-4 text-center text-black" style="border-color:#FF0099;">BIN DECO</h2>
+      <div id="decoStickers" class="flex flex-wrap gap-2 p-2"></div>
     </section>
   </main>
 
-  <!-- Floating Tab Bar (Pill) -->
-  <nav id="tabBar" class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] sm:w-[calc(100%-2rem)] max-w-[420px] z-30 px-2 transition-[visibility] duration-0" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
-    <div class="h-16 rounded-full bg-white/80 backdrop-blur-md shadow-soft-lg flex items-center justify-center gap-0">
-      <button type="button" data-tab="schedule" class="tab-btn flex-1 flex flex-col items-center justify-center py-2 text-ink/50 data-[active=true]:text-emerald transition-colors min-h-[4rem]">
-        <span class="text-[11px] font-medium tracking-stationery">Calendar</span>
-      </button>
-      <button type="button" data-tab="diary" class="tab-btn flex-1 flex flex-col items-center justify-center py-2 text-ink/50 data-[active=true]:text-emerald transition-colors min-h-[4rem]">
-        <span class="text-[11px] font-medium tracking-stationery">Archive</span>
-      </button>
-      <button type="button" id="dumpTrigger" class="dump-bin flex-shrink-0 -mt-8 w-[56px] h-[56px] rounded-full bg-emerald flex items-center justify-center text-white flex-shrink-0 p-0" title="분리수거">
-        <svg class="w-7 h-7 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
+  <!-- Navigation: Steel Dashboard (Mechanical Buttons) -->
+  <nav id="tabBar" class="fixed bottom-0 left-0 right-0 max-w-[450px] mx-auto z-30 p-2 steel-beam chrome-molding border-b-0">
+    <div class="flex items-end justify-center gap-0">
+      <button type="button" data-tab="calendar" class="tab-btn flex-1 metal-magnet chrome-molding py-2 px-1 text-xs font-impact btn-mechanical text-black flex flex-col items-center justify-center gap-0.5">
+        <svg class="w-6 h-6 flex-shrink-0 nav-icon-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#444">
+          <path stroke-width="2" d="M 8,16 15,14 83,6 92,78 29,94 22,92 z"/>
+          <path fill="#287293" stroke="#888" d="m 8,16 7,-2 68,-8 3,25 -67,9 -6,1 z"/>
+          <path stroke="#ddd" d="m 15,15 c 1,7 3,19 4,23"/>
+          <path fill="#ccc" stroke="#888" d="m 19,39 -6,1 9,52 7,2 C 29,94 92,79 92,78 92,77 86,30 86,30 z"/>
+          <path fill="#eee" stroke="#aaa" d="m 86,30 c 0,0 4,22 11,33 -3,6 -14,14 -19,15 -6,1 -45,13 -45,13 0,0 -4,-2 -6,-11 L 19,39 z"/>
+          <path fill="#ddd" stroke="#aaa" d="M 97,63 C 96,62 93,60 93,60 L 81,77 c 0,0 11,-6 16,-14"/>
+          <path fill="#444" d="m 56,41 22,-4 1,5 c 0,0 -8,13 -5,31 l -6,2 c 0,0 -4,-13 4,-31 L 57,47 z M 32,54 c 6,-2 7,-7 8,-11 l 6,-1 8,36 -7,2 -6,-26 c 0,0 -3,5 -7,6 z"/>
         </svg>
       </button>
-      <button type="button" data-tab="memo" class="tab-btn flex-1 flex flex-col items-center justify-center py-2 text-ink/50 data-[active=true]:text-emerald transition-colors min-h-[4rem]">
-        <span class="text-[11px] font-medium tracking-stationery">Memo</span>
+      <button type="button" data-tab="archive" class="tab-btn flex-1 metal-magnet chrome-molding py-2 px-1 text-xs font-impact btn-mechanical text-black flex flex-col items-center justify-center gap-0.5">
+        <svg class="w-6 h-6 flex-shrink-0 nav-icon-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#444" stroke="#333" stroke-width="1.5" d="m 18,42 c 4,4 16,20 16,20 0,0 -2,8 0,13 C 33,75 11,52 11,52 11,52 -6,36 5,19 c 6,10 7,17 13,23 z"/>
+          <path fill="#555" stroke="#444" stroke-width="2" stroke-linejoin="round" d="m 4,23 c 1,-8 11,-10 16,-9 5,1 12,2 23,11 L 71,48 34,62 13,42 C 7.5,35 3,30 4,23 z"/>
+          <path fill="#444" stroke="#222" d="M 72,48 34,62 c 0,0 -3,10 1,14 L 71,61 c 4,-5 1,-13 1,-13 z"/>
+          <path fill="#C5C3BA" stroke="#333" d="m 70,53 -32,12 0,8 20,22 34,-17 0,-8 z"/>
+          <path fill="#757368" d="M 38,65 58,86 58,94 38,73 z"/>
+          <path fill="none" stroke="#fff" d="M 58,86 39,66"/>
+          <path fill="#444" d="M 59,86 91,71 91,77 59,93 z"/>
+          <path fill="#eee" d="m 87,74 2,2 -28,14 -2,-3 z"/>
+          <path fill="#555" stroke="#555" d="m 66,64 8,-3 5,4 -8,4 z m -16,7 9,-4 5,5 -9,4 z"/>
+          <path fill="#eee" d="m 25.8,28.6 8.8,2.7 -3.6,1.7 9.8,10.3 2.3,-7 -2.1,-2.3 -1.4,0.7 -2.8,-3.1 4.4,-2 2.5,2.7 -1.5,0.9 2.8,2.8 -2.9,8.6 3.4,3.8 c 0,0 2,-0.3 3.4,1.3 1,1.1 0.8,2.1 -0.3,2.9 -1.4,0.6 -2.9,0.9 -4.4,-0.7 -1.1,-1.5 0.1,-2.5 0.1,-2.5 L 42,47 32.5,49.7 29.9,46.8 c 0,0 -2.4,0.1 -4.1,-1.7 -0.9,-1.3 -0.3,-3.2 1.4,-3.7 2.1,-0.8 3.3,0.1 4.3,1.1 1.8,1.8 -0.2,3.8 -0.2,3.8 l 1.7,1.7 7.7,-2.2 -11,-12 -3.6,1.8 z"/>
+        </svg>
       </button>
-      <button type="button" data-tab="garden" class="tab-btn flex-1 flex flex-col items-center justify-center py-2 text-ink/50 data-[active=true]:text-emerald transition-colors min-h-[4rem]">
-        <span class="text-[11px] font-medium tracking-stationery">Garden</span>
+      <button type="button" id="dumpTrigger" class="flex-shrink-0 -mt-6 w-16 h-16 rounded-full chrome-molding-outer flex items-center justify-center overflow-hidden" style="background:linear-gradient(145deg,#e8e8e8 0%,#C0C0C0 40%,#909090 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,0.9), inset -1px -1px 0 rgba(0,0,0,0.3), 3px 3px 0 #000;filter:drop-shadow(2px 2px 2px rgba(0,0,0,0.4));">
+        <svg class="w-8 h-8 flex-shrink-0 nav-icon-svg" viewBox="0 -27.5 1079 1079" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#178E3B" d="M161.102552 256.441195L327.729968 26.072988H704.575356l112.011962 126.153131-41.753074 160.221057-228.096183-12.775472 33.136768-50.145901-58.389742-96.44302-180.569938 238.649295-179.812597-135.290883z"/>
+          <path fill="#2FA65B" d="M204.737804 225.613695l167.061955 102.576239-23.933214 38.978226-167.061956-102.576239z"/>
+          <path fill="#203529" d="M350.537103 423.788705a25.960653 25.960653 0 0 1-13.656967-3.898443L136.445518 295.872584a26.072392 26.072392 0 0 1-8.305919-36.128886l115.401373-182.047374A166.366692 166.366692 0 0 1 384.754014 0.000596h259.023007a166.565339 166.565339 0 0 1 140.4557 76.479017l25.029496 38.760956 40.610855-22.571243a26.072392 26.072392 0 0 1 36.488933 33.397493l-95.598771 214.786849a26.072392 26.072392 0 0 1-25.699929 15.395126l-239.183158-17.207778A26.072392 26.072392 0 0 1 512.757043 291.763078l43.602972-30.678515-36.439272-60.177563-147.991863 211.732654a26.072392 26.072392 0 0 1-21.391777 11.149051zM186.305864 265.392716L343.311326 362.530999l156.794399-224.371556a26.072392 26.072392 0 0 1 43.68988 1.427774l69.774687 115.252388a26.072392 26.072392 0 0 1-7.30027 34.825266l-3.724627 2.619655L750.512427 302.93696l56.949554-127.878875a26.072392 26.072392 0 0 1-28.76654-11.012482l-38.264339-59.271237A114.619201 114.619201 0 0 0 643.777021 52.14538H384.754014a114.495047 114.495047 0 0 0-97.17553 53.460819z"/>
+          <path fill="#203529" d="M454.975656 144.466479a13.036196 13.036196 0 0 1-12.018131-7.970703c-6.207712-14.62537-18.759707-23.812785-37.407675-27.313935a96.207127 96.207127 0 0 0-29.36248-0.744925 13.036196 13.036196 0 0 1-4.246075-25.72476 121.509762 121.509762 0 0 1 37.606322 0.670433c27.835382 4.96617 47.700062 19.86468 57.458586 42.969785a13.048611 13.048611 0 0 1-12.005716 18.114105zM519.312387 995.469354h-1.080142l-215.357958-8.90186a166.366692 166.366692 0 0 1-137.898123-83.456485L35.470869 678.776699a166.565339 166.565339 0 0 1-3.985352-159.873425l21.106222-41.05781-39.853513-23.887277a26.072392 26.072392 0 0 1 10.677265-48.296002l233.869356-24.570126a26.072392 26.072392 0 0 1 26.184131 14.550878l104.624785 215.718005a26.072392 26.072392 0 0 1-34.427973 35.036329l-48.420157-22.422257-33.894109 61.642584 257.409001 22.260857a26.072392 26.072392 0 0 1 23.812785 26.767655l-7.200946 235.545439a26.072392 26.072392 0 0 1-26.072392 25.277805zM105.220725 449.438973a26.072392 26.072392 0 0 1 4.842016 30.41779l-32.180781 62.834465a114.619201 114.619201 0 0 0 2.743808 110.013079l129.517712 224.309479a114.495047 114.495047 0 0 0 94.891091 57.433755l189.024842 7.809302 5.636603-184.555289-272.742051-23.589307a26.072392 26.072392 0 0 1-20.59719-38.487817l64.920256-118.058274a26.072392 26.072392 0 0 1 33.807202-11.086974l4.134336 1.911975-64.74644-133.527893z"/>
+          <path fill="#203529" d="M253.113265 877.609727a13.011365 13.011365 0 0 1-10.06891-4.755108 121.509762 121.509762 0 0 1-18.225843-32.900876c-9.584708-26.606255-6.642252-51.238458 8.479735-71.239707a13.036196 13.036196 0 0 1 20.795836 15.730343c-23.701046 31.336532 8.690797 71.45077 9.075676 71.848063a13.036196 13.036196 0 0 1-10.056494 21.317285zM718.095753 1024a26.072392 26.072392 0 0 1-21.106222-10.751758L558.781023 822.994273a26.072392 26.072392 0 0 1-0.484202-29.946005L692.780702 594.575288a26.072392 26.072392 0 0 1 47.551077 12.291271l4.767523 53.100771 70.333381-1.46502-109.404723-234.055587a26.072392 26.072392 0 0 1 11.273206-34.005849L924.949145 278.900698a26.072392 26.072392 0 0 1 35.433623 10.875912L1060.277275 480.738258A166.366692 166.366692 0 0 1 1056.962357 641.878056L927.43223 866.199951a166.565339 166.565339 0 0 1-136.457933 83.394408L744.925486 951.891213l-0.757341 46.458519a26.072392 26.072392 0 0 1-26.072392 25.650268z m-106.375359-216.847809L694.022245 920.430527a26.072392 26.072392 0 0 1 23.924523-19.405309L788.379473 897.511652a114.619201 114.619201 0 0 0 93.897857-57.384093L1011.857119 615.805664a114.495047 114.495047 0 0 0 2.296853-110.894574l-87.739807-167.608234-162.642064 87.392175 115.947652 247.99811a26.072392 26.072392 0 0 1-23.080275 37.109704L721.870042 712.645978a26.072392 26.072392 0 0 1-26.506932-23.738293l-0.409709-4.544045z"/>
+          <path fill="#203529" d="M915.376853 650.46953a72.195695 72.195695 0 0 1-8.939106-0.558694 13.036196 13.036196 0 1 1 3.22801-25.873745c38.984434 4.866847 57.495832-43.305002 57.682064-43.789203a13.036196 13.036196 0 1 1 24.42114 9.150168 121.509762 121.509762 0 0 1-19.380478 32.280104c-16.06556 18.958354-35.619854 28.79137-57.01163 28.79137z"/>
+        </svg>
+      </button>
+      <button type="button" data-tab="memo" class="tab-btn flex-1 metal-magnet chrome-molding py-2 px-1 text-xs font-impact btn-mechanical text-black flex flex-col items-center justify-center gap-0.5">
+        <svg class="w-6 h-6 flex-shrink-0 nav-icon-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#333" d="m 76.8,7.9 -12.9,11.6 0,6.4 1.5,0.8 1.4,-5.1 10,-8.6 z m 20.3,9.3 -13.7,11.6 0,5.8 5,2.1 -13.7,13 0,18.8 15.9,-17.3 -1.5,-7.9 10.2,-10.2 z m -29.6,10.2 -14.4,12.3 0,14.4 4.4,-12.3 10,-8.7 z"/>
+          <path fill="#999" d="M 63.9,19.5 48.1,12.3 62.5,1.16 76.8,7.9 M 83.4,28.8 66.8,21.6 80.4,10.1 97.1,17.2 M 74.7,49.7 57.5,41.8 71.9,29.5 88.4,36.7 m -35.3,3 -15.8,-7.2 13.6,-12.3 16.6,7.2"/>
+          <path fill="#ccc" d="m 65.4,26.7 1.4,-5.1 16.6,7.2 0,5.8 -11.5,-5.1 -4.4,3.6 0,-5.7 z m -23.1,0.7 5.8,-15.1 15.8,7.2 0,6.4 -13,-5.7 z m -10.6,18.7 5.6,-13.6 15.8,7.2 0,14.4 4.4,-12.3 17.2,7.9 0,18.8 z"/>
+          <path fill="none" stroke="#111" stroke-width="1.5" d="m 76.2,36.1 c -1.5,-2.2 -4.3,-2.2 -5.1,-0.8 -0.7,1.4 3.6,2.9 1.5,5 -0.7,0.8 -4.3,0 -5.1,-2.1 M 81.2,13 l -2.9,5 4.4,-0.8 0,3.7 5.7,-3.7 M 63.2,9.4 63.9,12.3 M 66.1,6.49 C 64.7,5.05 61.7,5.05 59.6,7.2 c -1.5,1.5 0,3.6 2.9,3.6 2.2,0 5,-2.1 3.6,-4.31 z m -16.6,20.91 4.4,2.1 m -8,-0.7 8.6,-2.9 -2.1,6.6"/>
+          <path fill="none" stroke="#222" stroke-width="1" d="M 42.3,27.4 48.1,12.3 62.5,1.16 76.8,7.9 l 0,5.1 m -24.4,43.9 5.1,-15.1 14.4,-12.3 16.5,7.2 2.2,14.5 -15.9,17.3 -43,-22.4 5.6,-13.6 13.6,-12.3 16.6,7.2 0,5.7 m -2.1,-6.4 1.4,-5.1 13.6,-11.5 16.7,7.1 2.2,15.9 -10.2,10.2"/>
+          <path fill="#444" stroke="#333" d="M 19.9,46.4 C 0.918,35.2 20.7,22.3 16.2,13.5 10.6,6.5 4.43,8.59 -0.014,7.13 L -0.339,4.14 C 9.85,4.69 16.1,6.69 19.2,12.7 c 6.3,8.1 -15.28,21.9 4.1,32 0,0.6 -3.4,1.7 -3.4,1.7 z"/>
+          <path fill="#444" stroke="#333" stroke-width="1.5" d="M 44.9,46.4 C 55.2,51.5 62,61.8 65.4,72 c 1.2,5.7 2.3,17.1 -8,21.6 C 48.3,98.2 39.2,99.3 27.9,91.4 18.8,83.4 9.25,72 5.85,67.5 3.57,64 2.55,61.8 3,57.2 3,53.8 4.82,52.7 11.4,49.8 26.7,42.9 31.3,44 37,44 c 4.5,0 7.9,2.4 7.9,2.4 z"/>
+          <path fill="#626262" stroke="#ccc" d="m 55.2,53.8 c 1.1,3.4 -13.7,8 -13.7,8 0,0 -8,-12 -18.2,-16.5 0,0 8,-1.3 12.5,-1.3 3.4,0 6.9,0.7 12.5,4.7 3.5,2.8 6.9,5.1 6.9,5.1 z M 6.87,51.5 C 14.2,53.8 19.9,61.8 22.2,64 c 2.2,2.3 3.4,2.3 6.8,2.3 5.7,-1.1 12.5,-4.5 12.5,-4.5 0,0 -9.1,-12 -19.3,-16.5 -3.4,1.1 -10.8,4.5 -15.33,6.2 z"/>
+          <path fill="#333" stroke="#ccc" stroke-width="1.5" d="m 26.7,47.5 c -2.3,2.3 5.7,8.6 8,6.3 2.3,-2.3 -4.6,-7.4 -8,-6.3 z"/>
+          <path fill="none" stroke="#222" stroke-width="1.5" d="M 44.9,46.4 C 55.2,51.5 62,61.8 65.4,72 c 1.2,5.7 2.3,17.1 -8,21.6 C 48.3,98.2 39.2,99.3 27.9,91.4 18.8,83.4 9.25,72 5.85,67.5 3.57,64 2.55,61.8 3,57.2 3,53.8 4.82,52.7 11.4,49.8 26.7,42.9 31.3,44 37,44 c 4.5,0 7.9,2.4 7.9,2.4 z"/>
+          <path fill="#ccc" d="m 25.6,69.7 c 7.9,16 26.2,23.9 38.7,5.7 C 54,97 30.1,90.2 25.6,69.7 z"/>
+        </svg>
+      </button>
+      <button type="button" data-tab="deco" class="tab-btn flex-1 metal-magnet chrome-molding py-2 px-1 text-xs font-impact btn-mechanical text-black flex flex-col items-center justify-center gap-0.5">
+        <svg class="w-6 h-6 flex-shrink-0 nav-icon-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="navGraphicsGrad" gradientUnits="userSpaceOnUse" x2="87">
+              <stop stop-color="#DA00FF" offset="0"/>
+              <stop stop-color="#0010FF" offset=".1"/>
+              <stop stop-color="#00F7FF" offset=".3"/>
+              <stop stop-color="#15CA15" offset=".5"/>
+              <stop stop-color="#E0FF00" offset=".7"/>
+              <stop stop-color="#FF5E00" offset=".9"/>
+              <stop stop-color="#FF0013" offset="1"/>
+            </linearGradient>
+          </defs>
+          <path fill="#111" stroke="#666" d="m 41,81 0,8 c 0,0 -6,0 -7,0 -4,0 -6,6 -6,6 2,0 43,0 44,0 0,0 -1,-6 -4,-6 -2,0 -7,0 -7,0 l 0,-8"/>
+          <path fill="#fff" stroke="#000" stroke-width="4" stroke-linecap="butt" d="m 4.7,74 c 0,-16 0,-45 0,-57 0,-4 0,-8.8 5.2,-8.8 9.1,0 76.1,0 81.1,0 5,0 5,4.8 5,12.8 0,11 0,46 0,53 0,1 0,5 -8,5 -5,0 -74,0 -78.1,0 -5.2,0 -5.2,-5 -5.2,-5 z"/>
+          <path fill="#888" stroke="#fff" d="M 7.8,12 93,12 93,75 7.8,75 z"/>
+          <rect height="63" width="84" y="12" x="8" fill="url(#navGraphicsGrad)" fill-opacity="0.8"/>
+        </svg>
       </button>
     </div>
   </nav>
 
-  <!-- The Dump Modal: Immersive Full-Screen -->
-  <div id="dumpModal" class="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] sm:max-w-[480px] h-[100dvh] h-[100vh] z-[50] hidden flex-col bg-[#F5F5F5]/98">
-    <button type="button" id="dumpModalClose" class="absolute top-5 right-5 z-[52] w-11 h-11 rounded-full bg-ink/10 flex items-center justify-center text-ink text-xl font-bold hover:bg-ink/20 transition-colors" aria-label="닫기">×</button>
-    <div class="flex-1 flex flex-col min-h-0 pt-14 px-4 sm:px-6 pb-4">
-      <textarea id="dumpText" rows="6" class="flex-1 min-h-[40dvh] w-full p-4 resize-none bg-transparent text-ink text-[17px] placeholder:text-ink/40 outline-none tracking-stationery" placeholder="여기에 맘껏 쏟아내세요...&#10;&#10;#태그, 시간(15:00) 등도 함께 적어도 돼요."></textarea>
-      <div id="dumpOptions" class="mt-3 space-y-2 text-sm">
-        <div class="flex items-center gap-2">
-          <label class="text-ink/60 shrink-0 w-20">날짜·시간</label>
-          <input type="datetime-local" id="dumpDateTime" class="flex-1 rounded-xl px-3 py-2 bg-white/80 shadow-soft text-ink outline-none text-sm" />
-        </div>
-        <div class="flex items-center gap-2">
-          <label class="text-ink/60 shrink-0 w-20">반복</label>
-          <select id="dumpRecurring" class="flex-1 rounded-xl px-3 py-2 bg-white/80 shadow-soft text-ink outline-none text-sm">
-            <option value="">없음</option>
-            <option value="weekly">매주</option>
-            <option value="monthly">매월</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-ink/60 block mb-1">사진 (선택)</label>
-          <input type="file" id="dumpImage" accept="image/*" class="w-full text-sm text-ink/60 file:py-2 file:px-3 file:rounded-lg file:bg-white/80 file:text-emerald file:font-medium" />
-        </div>
+  <!-- The Dump Modal (Chrome Bin + Vinyl Stickers + Metal Chain Keyrings) -->
+  <div id="dumpModal" class="fixed inset-0 z-50 hidden flex-col max-w-[450px] mx-auto" style="background:linear-gradient(180deg,#5a6578 0%,#4A5568 100%);">
+    <button type="button" id="dumpModalClose" class="absolute top-4 right-4 z-10 w-10 h-10 metal-magnet chrome-molding flex items-center justify-center text-black text-xl font-impact btn-mechanical">×</button>
+    <div class="flex-1 flex flex-col pt-12 px-4 pb-4">
+      <textarea id="dumpText" rows="4" class="w-full p-3 bg-white chrome-molding text-black placeholder-gray-500 resize-none text-sm user-text" placeholder="예: 2/19 미팅, 14:00 회의, #태그..."></textarea>
+      <div class="mt-2 flex items-center gap-2">
+        <label class="text-[#C0C0C0] text-xs whitespace-nowrap">날짜 (일정 추가일)</label>
+        <input type="date" id="dumpDateInput" class="flex-1 min-w-0 bg-white chrome-molding px-2 py-1.5 text-black text-xs user-text" />
+      </div>
+      <div class="mt-3 grid grid-cols-2 gap-2">
+        <label class="text-[#C0C0C0] text-xs">YouTube (subs)</label>
+        <label class="text-[#C0C0C0] text-xs">Instagram (followers)</label>
+        <input type="number" id="dumpYoutube" min="0" class="bg-white chrome-molding p-2 text-black text-sm user-text" placeholder="1235" />
+        <input type="number" id="dumpInsta" min="0" class="bg-white chrome-molding p-2 text-black text-sm user-text" placeholder="3489" />
+      </div>
+      <div class="mt-2">
+        <label class="text-[#C0C0C0] text-xs block mb-1">Photo (optional)</label>
+        <input type="file" id="dumpImage" accept="image/*" class="w-full text-[#C0C0C0] text-xs file:metal-magnet file:chrome-molding file:px-2 file:py-1 file:text-black file:text-xs" />
+      </div>
+      <div class="mt-2">
+        <label class="text-[#C0C0C0] text-xs block mb-1">몰아넣기</label>
+        <input type="file" id="dumpBulkImages" accept="image/*" multiple class="w-full text-[#C0C0C0] text-xs file:metal-magnet file:chrome-molding file:px-2 file:py-1 file:text-black file:text-xs" />
+        <p class="text-[#808080] text-[10px] content-font mt-0.5">사진 여러 장 선택 시, 촬영·캡처 날짜에 맞춰 그날 일기에 들어갑니다.</p>
       </div>
     </div>
-    <div class="flex-shrink-0 flex flex-col items-center pb-8 pt-2">
-      <button type="button" id="dumpSubmit" class="dump-throw-btn w-[calc(100%-2.5rem)] max-w-[320px] py-4 rounded-2xl bg-emerald text-white font-bold text-[16px] shadow-soft-lg hover:bg-emerald-light transition-all tracking-stationery">분리수거 하기 (던지기)</button>
-      <div id="dumpBinWrap" class="mt-4 animate-bin-rise w-40 h-40 flex items-center justify-center">
-        <svg id="dumpBinSvg" class="w-full h-full drop-shadow-lg" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path fill="#059669" d="M341.511,503.983H167.111c-17.519,0-32.206-13.236-34.021-30.661L93.528,93.528h290.739L341.511,503.983z"/>
-          <path fill="#047857" d="M384.267,93.528H93.528l6.235,59.858l33.327,319.936c1.815,17.424,16.502,30.661,34.021,30.661h25.653c-17.519,0-32.206-13.236-34.021-30.661l-32.344-310.5c-0.526-5.046,3.432-9.437,8.505-9.437h243.127L384.267,93.528z"/>
-          <path fill="#059669" d="M401.37,127.733H76.426c-9.446,0-17.102-7.656-17.102-17.102V59.324h359.148v51.307C418.472,120.076,410.815,127.733,401.37,127.733z"/>
-          <rect x="59.324" y="59.324" fill="#047857" width="359.148" height="17.102"/>
-          <path fill="#059669" d="M418.472,59.324H59.324V42.221c0-18.891,15.314-34.205,34.205-34.205h290.739c18.891,0,34.205,15.314,34.205,34.205V59.324z"/>
-          <path fill="#10B981" d="M384.267,8.017H93.528c-12.805,0-23.959,7.041-29.822,17.458h350.383C408.227,15.058,397.073,8.017,384.267,8.017z"/>
-          <circle fill="#D1FAE5" cx="341.511" cy="461.228" r="42.756"/>
-          <circle fill="#6B7280" cx="341.511" cy="461.228" r="17.102"/>
+    <div class="flex-shrink-0 flex flex-col items-center pb-8">
+      <button type="button" id="dumpSubmit" class="w-full max-w-[280px] py-3 neon-lime font-impact text-black text-center">버리기</button>
+      <div id="dumpBinContainer" class="mt-4 relative w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center animate-bin-rise">
+        <div id="dumpBinStickers" class="absolute inset-0 pointer-events-none z-10"></div>
+        <div class="absolute -top-2 left-1/2 -translate-x-1/2 flex flex-col items-center z-20">
+          <div class="keyring-chain w-14 h-1 rounded-sm mb-0.5" style="box-shadow:inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+          <div id="dumpBinKeyrings" class="flex gap-0.5 keyring-swing origin-top flex-wrap justify-center max-w-[120px]"></div>
+        </div>
+        <svg id="dumpBinSvg" class="w-full h-full chrome-molding rounded-b-lg chrome-bin-svg absolute bottom-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#dddddd" d="m 84,31 c 0,0 -28,16 -67,1 l 5,53 c 0,0 4,11 27,11 26,0 30,-11 30,-11 l 5,-54 z"/>
+          <path fill="#762F00" stroke="#200C00" d="M 80,63 C 70,53 67,81 53,73 49,69 52,63 46,63 40,63 34,66 32,71 28,62 22,58 22,58 l 1,27 c 0,0 3,10 26,10 26,0 29,-10 29,-10 z"/>
+          <path fill="#888888" stroke="#444444" stroke-width="2" d="M 84 31 C 84 31 56 47 17 32 L 22 85 C 22 85 26 96 49 96 C 75 96 79 85 79 85 L 84 31 z M 27 40 L 28 40 C 32 41 32 45 32 45 L 36 82 C 36 82 36 86 33 85 C 30 84 30 80 30 80 L 26 44 C 26 44 25 40 27 40 z M 73 40 C 76 40 75 44 75 44 L 71 80 C 71 80 70 85 67 85 C 64 85 65 81 65 81 L 69 45 C 69 45 70 40 73 40 z M 50 44 C 54 44 54 47 54 47 L 54 85 C 54 85 53 88 50 88 C 47 88 46 85 46 85 L 46 47 C 46 47 46 44 50 44 z"/>
+          <ellipse cx="50" cy="23" rx="42" ry="17" fill="#555555"/>
+          <ellipse cx="50" cy="19" rx="42" ry="17" fill="#aaaaaa"/>
+          <ellipse cx="50" cy="18" rx="37" ry="13" fill="#333333"/>
+          <ellipse cx="50" cy="20" rx="37" ry="12" fill="#666666"/>
+          <path fill="#aaaaaa" stroke="#333333" stroke-width="1" d="M 32,19 C 32,2 50,2 50,2 50,2 68,2 68,19 l -5,0 C 63,19 64,6.9 50,6.9 37,6.9 37,19 37,19 z"/>
         </svg>
       </div>
     </div>
   </div>
 
-  <!-- Paper suck animation (inside modal, so z-[51]) -->
-  <div id="suckOverlay" class="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] sm:max-w-[480px] h-[100dvh] z-[51] pointer-events-none hidden items-center justify-center">
-    <div id="suckCard" class="absolute w-24 h-28 rounded-lg bg-white shadow-soft-lg flex items-center justify-center text-ink/80 text-2xl border border-ink/10" style="top: 25dvh; left: 50%; margin-left: -48px;"></div>
+  <div id="suckOverlay" class="fixed inset-0 z-[51] pointer-events-none hidden items-center justify-center max-w-[450px] mx-auto">
+    <div id="suckCard" class="absolute w-20 h-24 chrome-molding rounded filter drop-shadow-lg" style="top:20vh;left:50%;margin-left:-40px;background:#fef3c7;"></div>
+  </div>
+
+  <!-- Period (SYSTEM ERROR) modal: 12월~2월 시작일 입력 → 평균 주기 계산 → 달력에 핑크 표시 -->
+  <div id="periodStartModal" class="fixed inset-0 z-50 hidden flex-col max-w-[450px] mx-auto" style="background:linear-gradient(180deg,#5a6578 0%,#4A5568 100%);">
+    <button type="button" id="periodStartModalClose" class="absolute top-4 right-4 z-10 w-10 h-10 metal-magnet chrome-molding flex items-center justify-center text-black text-xl font-impact btn-mechanical">×</button>
+    <div class="pt-12 px-4 pb-8">
+      <h3 class="text-xl font-impact text-[#C0C0C0] mb-2">주기 정보 입력</h3>
+      <div id="periodResultSection" class="hidden mb-4">
+        <p class="text-[#C0C0C0] font-impact text-sm mb-1">평균 주기: <span id="periodAvgCycleLabel">—</span>일</p>
+        <p class="text-[#b0b0b0] text-xs content-font mb-0.5" id="periodPmsRange">기분 안 좋을 수 있어요: —</p>
+        <p class="text-[#b0b0b0] text-xs content-font mb-2" id="periodGoldenRange">황금기: —</p>
+        <div id="periodPhaseCal" class="metal-engraved chrome-molding p-2 rounded text-center"></div>
+      </div>
+      <p class="text-[#b0b0b0] text-xs content-font mb-2">작년 8월~올해 2월, 내가 실제로 시작한 날을 한 줄에 하나씩 입력. 다음 주기부터 계산해서 표시해요.</p>
+      <textarea id="periodStartInput" class="w-full p-3 metal-engraved chrome-molding text-[#b0b0b0] text-sm resize-none user-text mb-3" rows="4" placeholder="2024-8-5&#10;2024-9-2&#10;2024-9-30&#10;2025-2-2"></textarea>
+      <button type="button" id="periodCalcBtn" class="w-full py-2 neon-lime font-impact text-black">계산해서 달력에 표시</button>
+    </div>
+  </div>
+
+  <!-- Date detail modal -->
+  <div id="dateModal" class="fixed inset-0 z-50 hidden flex-col max-w-[450px] mx-auto" style="background:linear-gradient(180deg,#5a6578 0%,#4A5568 100%);">
+    <button type="button" id="dateModalClose" class="absolute top-4 right-4 z-10 w-10 h-10 metal-magnet chrome-molding flex items-center justify-center text-black btn-mechanical">×</button>
+    <div class="pt-12 px-4 pb-8">
+      <h3 id="dateModalTitle" class="text-2xl font-impact neon-lime-text mb-4">—</h3>
+      <div id="dateModalContent" class="space-y-3"></div>
+      <textarea id="dateModalInput" class="w-full mt-4 p-3 metal-engraved chrome-molding text-[#b0b0b0] text-sm resize-none user-text" rows="3" placeholder="Add note for this date..."></textarea>
+      <button type="button" id="dateModalSave" class="mt-3 w-full py-2 neon-lime font-impact text-black">SAVE</button>
+    </div>
   </div>
 
   <script>
-    (function () {
-      const STORAGE_KEYS = {
-        schedules: 'remind_schedules',
-        diaries: 'remind_diaries',
-        memos: 'remind_memos',
-        gardenTags: 'remind_garden_tags',
-        periodDates: 'remind_period_dates',
-      };
+(function() {
+  const KEYS = { data: 'remind_data', tags: 'remind_tags', stats: 'user_stats', archivePositions: 'remind_archive_positions' };
+  let remindData = JSON.parse(localStorage.getItem(KEYS.data) || '{}');
+  let remindTags = JSON.parse(localStorage.getItem(KEYS.tags) || '{}');
+  let userStats = JSON.parse(localStorage.getItem(KEYS.stats) || '{}');
+  let archivePositions = {};
+  try { archivePositions = JSON.parse(localStorage.getItem(KEYS.archivePositions) || '{}'); } catch(e) {}
 
-      let schedules = JSON.parse(localStorage.getItem(STORAGE_KEYS.schedules) || '[]');
-      let diaries = JSON.parse(localStorage.getItem(STORAGE_KEYS.diaries) || '[]');
-      let memos = JSON.parse(localStorage.getItem(STORAGE_KEYS.memos) || '[]');
-      let gardenTags = JSON.parse(localStorage.getItem(STORAGE_KEYS.gardenTags) || '{}');
-      let periodDates = JSON.parse(localStorage.getItem(STORAGE_KEYS.periodDates) || '[]');
+  function save() {
+    localStorage.setItem(KEYS.data, JSON.stringify(remindData));
+    localStorage.setItem(KEYS.tags, JSON.stringify(remindTags));
+    localStorage.setItem(KEYS.stats, JSON.stringify(userStats));
+  }
+  function saveArchivePositions() {
+    localStorage.setItem(KEYS.archivePositions, JSON.stringify(archivePositions));
+  }
 
-      function save() {
-        localStorage.setItem(STORAGE_KEYS.schedules, JSON.stringify(schedules));
-        localStorage.setItem(STORAGE_KEYS.diaries, JSON.stringify(diaries));
-        localStorage.setItem(STORAGE_KEYS.memos, JSON.stringify(memos));
-        localStorage.setItem(STORAGE_KEYS.gardenTags, JSON.stringify(gardenTags));
-        localStorage.setItem(STORAGE_KEYS.periodDates, JSON.stringify(periodDates));
-      }
+  function formatDate(d) {
+    const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+  const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  function getMonthDays(y, mo) {
+    const first = new Date(y, mo, 1), last = new Date(y, mo + 1, 0);
+    let dow = first.getDay(); if (dow === 0) dow = 7;
+    const pad = dow - 1;
+    const days = [];
+    for (let i = 0; i < pad; i++) days.push(null);
+    for (let d = 1; d <= last.getDate(); d++) days.push(d);
+    return days;
+  }
+  function ensureDate(dateStr) {
+    if (!remindData[dateStr]) remindData[dateStr] = { diary: [], schedule: [], socialScore: {} };
+    return remindData[dateStr];
+  }
+  function parseTime(text) {
+    const m = text.match(/(\d{1,2}):(\d{2})|(\d{1,2})시/);
+    if (m) {
+      if (m[1] != null) return m[1].padStart(2,'0') + ':' + m[2];
+      return m[3].padStart(2,'0') + ':00';
+    }
+    return null;
+  }
+  function parseDateInText(text) {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m1 = text.match(/(\d{1,2})\/(\d{1,2})(?:일)?/);
+    if (m1) {
+      const mo = parseInt(m1[1], 10), day = parseInt(m1[2], 10);
+      if (mo >= 1 && mo <= 12 && day >= 1 && day <= 31) return `${y}-${String(mo).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    }
+    const m2 = text.match(/(\d{1,2})-(\d{1,2})(?:일)?/);
+    if (m2) {
+      const mo = parseInt(m2[1], 10), day = parseInt(m2[2], 10);
+      if (mo >= 1 && mo <= 12 && day >= 1 && day <= 31) return `${y}-${String(mo).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    }
+    const m3 = text.match(/(\d{1,2})\.(\d{1,2})(?:일)?/);
+    if (m3) {
+      const mo = parseInt(m3[1], 10), day = parseInt(m3[2], 10);
+      if (mo >= 1 && mo <= 12 && day >= 1 && day <= 31) return `${y}-${String(mo).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    }
+    return null;
+  }
+  function stripDateAndTimeFromText(text) {
+    return text
+      .replace(/(\d{1,2})\/(\d{1,2})(?:일)?/g, '')
+      .replace(/(\d{1,2})-(\d{1,2})(?:일)?/g, '')
+      .replace(/(\d{1,2})\.(\d{1,2})(?:일)?/g, '')
+      .replace(/\d{1,2}:\d{2}|\d{1,2}시/g, '')
+      .replace(/#[\w가-힣]+/g, '')
+      .replace(/\s+/g, ' ')
+      .trim() || '일정';
+  }
+  function extractTags(text) {
+    const m = text.match(/#[\w가-힣]+/g) || [];
+    return [...new Set(m.map(t => t.slice(1)))];
+  }
+  function id() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+  function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-      function id() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
-
-      function isPeriodDay(dateStr) {
-        return periodDates.some(d => d === dateStr);
-      }
-      function updateBodyWeatherHeader() {
-        const today = formatDateOnly(new Date());
-        const header = document.getElementById('header');
-        const label = document.getElementById('bodyWeatherBtn');
-        if (isPeriodDay(today)) {
-          header.classList.add('body-weather-period');
-          label.textContent = '구름/빗방울';
-        } else {
-          header.classList.remove('body-weather-period');
-          label.textContent = '오늘의 바디웨더';
-        }
-      }
-      document.getElementById('bodyWeatherBtn').addEventListener('click', () => {
-        const today = formatDateOnly(new Date());
-        const idx = periodDates.indexOf(today);
-        if (idx >= 0) periodDates.splice(idx, 1);
-        else periodDates.push(today);
-        periodDates.sort();
-        save();
-        updateBodyWeatherHeader();
-      });
-      function formatDateOnly(d) {
-        const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
-        return `${y}-${m}-${day}`;
-      }
-      function parseTimeFromText(text) {
-        const m = text.match(/(\d{1,2}):(\d{2})/);
-        return m ? { hours: parseInt(m[1], 10), minutes: parseInt(m[2], 10) } : null;
-      }
-      function extractTags(text) {
-        const matches = text.match(/#[\w가-힣]+/g) || [];
-        return [...new Set(matches.map(t => t.slice(1)))];
-      }
-
-      let currentTab = 'schedule';
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          currentTab = btn.dataset.tab;
-          document.querySelectorAll('.tab-btn').forEach(b => b.dataset.active = b.dataset.tab === currentTab ? 'true' : 'false');
-          document.querySelectorAll('.tab-content').forEach(p => { p.classList.toggle('active', p.id === 'panel-' + currentTab); });
-          renderAll();
-        });
-      });
-      document.querySelector('[data-tab="schedule"]').dataset.active = 'true';
-
-      const dumpModal = document.getElementById('dumpModal');
-      const dumpTrigger = document.getElementById('dumpTrigger');
-      const dumpSubmit = document.getElementById('dumpSubmit');
-      const dumpText = document.getElementById('dumpText');
-      const dumpDateTime = document.getElementById('dumpDateTime');
-      const dumpRecurring = document.getElementById('dumpRecurring');
-      const dumpImage = document.getElementById('dumpImage');
-      const suckOverlay = document.getElementById('suckOverlay');
-
-      function openDumpModal() {
-        document.body.classList.add('dump-modal-open');
-        dumpModal.classList.remove('hidden');
-        dumpModal.classList.add('flex');
-        dumpText.value = '';
-        dumpDateTime.value = '';
-        dumpRecurring.value = '';
-        dumpImage.value = '';
-        dumpSubmit.classList.remove('throw-visible');
-        dumpBinWrap.classList.remove('animate-bin-rise');
-        void dumpBinWrap.offsetWidth;
-        dumpBinWrap.classList.add('animate-bin-rise');
-      }
-      function closeDumpModal() {
-        document.body.classList.remove('dump-modal-open');
-        dumpModal.classList.add('hidden');
-        dumpModal.classList.remove('flex');
-      }
-      dumpTrigger.addEventListener('click', openDumpModal);
-      document.getElementById('dumpModalClose').addEventListener('click', closeDumpModal);
-      dumpText.addEventListener('input', () => {
-        dumpSubmit.classList.toggle('throw-visible', dumpText.value.trim().length > 0);
-      });
-
-      function playSuckAnimation(callback) {
-        const card = document.getElementById('suckCard');
-        card.textContent = '📄';
-        card.className = 'absolute w-24 h-28 rounded-lg bg-white shadow-soft-lg flex items-center justify-center text-ink/80 text-2xl border border-ink/10 animate-paper-suck';
-        card.style.cssText = 'top: 20dvh; left: 50%; margin-left: -48px;';
-        suckOverlay.classList.remove('hidden');
-        suckOverlay.classList.add('flex');
-        setTimeout(() => {
-          card.className = 'absolute w-24 h-28 rounded-lg bg-white shadow-soft-lg flex items-center justify-center text-ink/80 text-2xl border border-ink/10';
-          card.textContent = '';
-          card.style.cssText = '';
-          suckOverlay.classList.add('hidden');
-          suckOverlay.classList.remove('flex');
-          if (callback) callback();
-        }, 650);
-      }
-
-      dumpSubmit.addEventListener('click', async () => {
-        const text = dumpText.value.trim();
-        const dateTimeVal = dumpDateTime.value;
-        const recurring = dumpRecurring.value;
-        const tags = extractTags(text);
-        const timeInText = parseTimeFromText(text);
-        const hasLongText = text.length > 80;
-        let imageBase64 = null;
-        if (dumpImage.files && dumpImage.files[0]) {
-          imageBase64 = await new Promise((res) => {
-            const r = new FileReader();
-            r.onload = () => res(r.result);
-            r.readAsDataURL(dumpImage.files[0]);
-          });
-        }
-        const hasPhoto = !!imageBase64;
-
-        const dateForSchedule = dateTimeVal ? new Date(dateTimeVal) : new Date();
-        const dateStr = formatDateOnly(dateForSchedule);
-        const timeStr = dateTimeVal ? dateTimeVal.slice(11, 16) : (timeInText ? `${String(timeInText.hours).padStart(2,'0')}:${String(timeInText.minutes).padStart(2,'0')}` : null);
-
-        if (dateStr && (timeStr || recurring)) {
-          const title = text.replace(/#[\w가-힣]+/g, '').replace(/\d{1,2}:\d{2}/g, '').trim() || 'Schedule';
-          schedules.push({
-            id: id(),
-            title,
-            date: dateStr,
-            time: timeStr || null,
-            recurring: recurring || null,
-            preset: null,
-            createdAt: new Date().toISOString(),
-          });
-          if (recurring === 'weekly' || recurring === 'monthly') {
-            const base = new Date(dateForSchedule);
-            for (let i = 1; i <= 12; i++) {
-              const next = new Date(base);
-              if (recurring === 'weekly') next.setDate(next.getDate() + 7 * i);
-              else next.setMonth(next.getMonth() + i);
-              schedules.push({
-                id: id(),
-                title,
-                date: formatDateOnly(next),
-                time: timeStr,
-                recurring,
-                preset: null,
-                createdAt: new Date().toISOString(),
-              });
-            }
+  function getPhotoDateStr(file) {
+    return new Promise((resolve) => {
+      const fallback = () => resolve(formatDate(new Date(file.lastModified)));
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const buf = r.result;
+          if (!buf || buf.byteLength < 20) { fallback(); return; }
+          const arr = new Uint8Array(buf);
+          const s = String.fromCharCode.apply(null, arr.subarray(0, Math.min(arr.length, 65536)));
+          const m = s.match(/(\d{4}):(\d{2}):(\d{2})/);
+          if (m) {
+            const y = parseInt(m[1], 10);
+            if (y >= 1990 && y <= 2030) { resolve(m[1] + '-' + m[2] + '-' + m[3]); return; }
           }
-        }
-        if (hasPhoto || hasLongText) {
-          diaries.push({
-            id: id(),
-            content: text,
-            imageBase64: imageBase64 || null,
-            createdAt: new Date().toISOString(),
-          });
-        }
-        if (tags.length) {
-          memos.push({ id: id(), content: text, tags, createdAt: new Date().toISOString() });
-          tags.forEach(t => { gardenTags[t] = (gardenTags[t] || 0) + 1; });
-        }
-        save();
-        playSuckAnimation(() => {
-          closeDumpModal();
-          renderAll();
-        });
-      });
+          fallback();
+        } catch (e) { fallback(); }
+      };
+      r.onerror = fallback;
+      r.readAsArrayBuffer(file.slice(0, 65536));
+    });
+  }
 
-      document.querySelectorAll('.preset-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const title = btn.dataset.preset;
-          const today = formatDateOnly(new Date());
-          schedules.push({ id: id(), title, date: today, time: null, recurring: null, preset: title, createdAt: new Date().toISOString() });
+  // User stats: lastVisit, totalRecords, attendanceDays[], youtube, insta
+  function updateUserStats() {
+    const today = formatDate(new Date());
+    userStats.lastVisit = today;
+    if (!userStats.attendanceDays) userStats.attendanceDays = [];
+    if (!userStats.attendanceDays.includes(today)) userStats.attendanceDays.push(today);
+    userStats.totalRecords = Object.values(remindData).reduce((sum, day) => sum + (day.diary?.length || 0) + (day.schedule?.length || 0), 0);
+    if (userStats.youtube == null) userStats.youtube = 1235;
+    if (userStats.insta == null) userStats.insta = 3489;
+  }
+
+  let currentTab = 'calendar';
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentTab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.dataset.active = b.dataset.tab === currentTab ? 'true' : 'false');
+      document.querySelectorAll('.tab-content').forEach(p => p.classList.toggle('active', p.id === 'panel-' + currentTab));
+      renderAll();
+    });
+  });
+  document.querySelector('[data-tab="calendar"]').dataset.active = 'true';
+
+  const dumpModal = document.getElementById('dumpModal');
+  const dumpTrigger = document.getElementById('dumpTrigger');
+  const dumpSubmit = document.getElementById('dumpSubmit');
+  const dumpText = document.getElementById('dumpText');
+  const dumpYoutube = document.getElementById('dumpYoutube');
+  const dumpInsta = document.getElementById('dumpInsta');
+  const dumpImage = document.getElementById('dumpImage');
+  const suckOverlay = document.getElementById('suckOverlay');
+  const suckCard = document.getElementById('suckCard');
+  const dumpBinStickers = document.getElementById('dumpBinStickers');
+  const dumpBinKeyrings = document.getElementById('dumpBinKeyrings');
+
+  let dumpSelectedDateStr = '';
+  const dumpDateInput = document.getElementById('dumpDateInput');
+  dumpTrigger.addEventListener('click', () => {
+    document.body.classList.add('dump-modal-open');
+    dumpModal.classList.remove('hidden');
+    dumpModal.classList.add('flex');
+    dumpText.value = '';
+    const now = new Date();
+    dumpSelectedDateStr = formatDate(now);
+    if (dumpDateInput) dumpDateInput.value = dumpSelectedDateStr;
+    dumpYoutube.value = userStats.youtube !== undefined && userStats.youtube !== null ? String(userStats.youtube) : '1235';
+    dumpInsta.value = userStats.insta !== undefined && userStats.insta !== null ? String(userStats.insta) : '3489';
+    dumpImage.value = '';
+    const dumpBulkImages = document.getElementById('dumpBulkImages');
+    if (dumpBulkImages) dumpBulkImages.value = '';
+    renderBinStickers();
+    renderBinKeyrings();
+  });
+  if (dumpDateInput) dumpDateInput.addEventListener('change', () => { dumpSelectedDateStr = dumpDateInput.value || dumpSelectedDateStr; });
+  document.getElementById('dumpModalClose').addEventListener('click', () => {
+    document.body.classList.remove('dump-modal-open');
+    dumpModal.classList.add('hidden');
+    dumpModal.classList.remove('flex');
+  });
+
+  function renderBinStickers() {
+    const tags = Object.entries(remindTags).sort((a,b) => b[1]-a[1]);
+    let html = '';
+    const maxShow = 12;
+    tags.slice(0, maxShow).forEach(([tag, count], i) => {
+      const rot = (i * 37) % 30 - 15;
+      const x = 20 + (i * 7) % 60;
+      const y = 30 + (i * 11) % 50;
+      const hologramClass = count >= 5 ? ' sticker-hologram' : '';
+      html += '<span class="absolute text-[10px] font-impact px-1 sticker-vinyl text-black' + hologramClass + '" style="left:' + x + '%;top:' + y + '%;transform:rotate(' + rot + 'deg)" title="#' + escapeHtml(tag) + '">#' + escapeHtml(tag) + '</span>';
+    });
+    dumpBinStickers.innerHTML = html;
+  }
+
+  const ATTENDANCE_MILESTONES = [1,3,5,7,10,15,20];
+  function getLightningCharmCount() {
+    const n = (userStats.attendanceDays || []).length;
+    const fromMilestones = ATTENDANCE_MILESTONES.filter(m => n >= m).length;
+    if (n >= 20) return fromMilestones + Math.floor((n - 20) / 5);
+    return fromMilestones;
+  }
+  const YOUTUBE_BASE_SUBS = 1235;
+  const INSTA_BASE_FOLLOWERS = 3489;
+  function renderBinKeyrings() {
+    const charms = [];
+    const yt = parseInt(dumpYoutube?.value || userStats.youtube || YOUTUBE_BASE_SUBS, 10) || YOUTUBE_BASE_SUBS;
+    const insta = parseInt(dumpInsta?.value || userStats.insta || INSTA_BASE_FOLLOWERS, 10) || INSTA_BASE_FOLLOWERS;
+    const ytSteps = Math.floor((yt - YOUTUBE_BASE_SUBS) / 5);
+    if (ytSteps > 0) {
+      for (let i = 0; i < ytSteps; i++) charms.push({ type: 'yt', label: '+' + (5 * (i + 1)) });
+    }
+    const instaSteps = Math.floor((insta - INSTA_BASE_FOLLOWERS) / 5);
+    if (instaSteps > 0) {
+      for (let j = 0; j < instaSteps; j++) charms.push({ type: 'insta', label: '+' + (5 * (j + 1)) });
+    }
+    for (let k = 0; k < getLightningCharmCount(); k++) charms.push({ emoji: '⚡', color: '#CCFF00' });
+    if ((userStats.totalRecords || 0) >= 5) charms.push({ emoji: '✏️', color: '#0033CC' });
+    let html = '';
+    charms.forEach(c => {
+      if (c.type === 'yt') {
+        html += '<span class="keyring-swing text-[10px] font-impact px-1 rounded border border-black bg-red-500 text-white" style="animation-delay:' + (Math.random() * 0.5) + 's">▶ ' + c.label + '</span>';
+      } else if (c.type === 'insta') {
+        html += '<span class="keyring-swing text-[10px] font-impact px-1 rounded border border-black bg-purple-500 text-white" style="animation-delay:' + (Math.random() * 0.5) + 's">📷 ' + c.label + '</span>';
+      } else {
+        html += '<span class="text-lg keyring-swing" style="animation-delay:' + (Math.random() * 0.5) + 's">' + c.emoji + '</span>';
+      }
+    });
+    dumpBinKeyrings.innerHTML = html;
+  }
+
+  function playSuckAnimation(cb) {
+    suckCard.className = 'absolute w-20 h-24 chrome-molding rounded animate-paper-suck filter drop-shadow-lg';
+    suckCard.style.cssText = 'top:20vh;left:50%;margin-left:-40px;background:#fef3c7;';
+    suckCard.textContent = '📄';
+    suckOverlay.classList.remove('hidden');
+    suckOverlay.classList.add('flex');
+    setTimeout(() => {
+      suckCard.className = 'absolute w-20 h-24 chrome-molding rounded';
+      suckCard.textContent = '';
+      suckOverlay.classList.add('hidden');
+      suckOverlay.classList.remove('flex');
+      if (cb) cb();
+    }, 520);
+  }
+
+  dumpSubmit.addEventListener('click', async () => {
+    const text = dumpText.value.trim();
+    const yt = parseInt(dumpYoutube.value || '0', 10);
+    const insta = parseInt(dumpInsta.value || '0', 10);
+    const today = formatDate(new Date());
+    const targetDateStr = parseDateInText(text) || (dumpDateInput && dumpDateInput.value) || dumpSelectedDateStr || today;
+    const day = ensureDate(targetDateStr);
+
+    const bulkInput = document.getElementById('dumpBulkImages');
+    if (bulkInput && bulkInput.files && bulkInput.files.length > 0) {
+      for (let i = 0; i < bulkInput.files.length; i++) {
+        const file = bulkInput.files[i];
+        const dateStr = await getPhotoDateStr(file);
+        const imageBase64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(file); });
+        const dayForPhoto = ensureDate(dateStr);
+        dayForPhoto.diary = dayForPhoto.diary || [];
+        dayForPhoto.diary.push({ id: id(), content: '', imageBase64, createdAt: new Date().toISOString() });
+      }
+      bulkInput.value = '';
+    }
+
+    const timeStr = parseTime(text);
+    if (timeStr) {
+      const title = stripDateAndTimeFromText(text);
+      day.schedule.push({ id: id(), title, time: timeStr, createdAt: new Date().toISOString() });
+    }
+
+    let imageBase64 = null;
+    if (dumpImage.files && dumpImage.files[0]) {
+      imageBase64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(dumpImage.files[0]); });
+    }
+    if (text || imageBase64) {
+      day.diary.push({ id: id(), content: text || '', imageBase64, createdAt: new Date().toISOString() });
+    }
+
+    const tags = extractTags(text);
+    tags.forEach(t => { remindTags[t] = (remindTags[t] || 0) + 1; });
+
+    if (yt > 0 || insta > 0) {
+      if (yt > 0) userStats.youtube = yt;
+      if (insta > 0) userStats.insta = insta;
+      day.socialScore = day.socialScore || {};
+      if (yt > 0) day.socialScore.youtube = yt;
+      if (insta > 0) day.socialScore.insta = insta;
+    }
+
+    updateUserStats();
+    save();
+    playSuckAnimation(() => {
+      document.body.classList.remove('dump-modal-open');
+      dumpModal.classList.add('hidden');
+      dumpModal.classList.remove('flex');
+      renderAll();
+    });
+  });
+
+  const PERIOD_LENGTH_DAYS = 5;
+  let periodDates = [];
+  let periodAvgCycle = 28;
+  let periodAnchorStr = '';
+  try { periodDates = JSON.parse(localStorage.getItem('remind_period_dates') || '[]'); } catch(e) {}
+  try { periodAvgCycle = parseInt(localStorage.getItem('remind_period_avg_cycle'), 10) || 28; } catch(e) {}
+  periodAnchorStr = localStorage.getItem('remind_period_anchor') || '';
+
+  function parsePeriodStartInput(text) {
+    const lines = text.trim().split(/\n/).map(s => s.trim()).filter(Boolean);
+    const dates = [];
+    for (const line of lines) {
+      const m = line.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (m) {
+        const y = parseInt(m[1], 10), mo = parseInt(m[2], 10), day = parseInt(m[3], 10);
+        if (mo >= 1 && mo <= 12 && day >= 1 && day <= 31)
+          dates.push(formatDate(new Date(y, mo - 1, day)));
+      }
+    }
+    return dates.sort();
+  }
+
+  function projectPeriodDatesFromAnchor(anchorDateStr, avgCycleDays) {
+    if (!anchorDateStr || !avgCycleDays) return [];
+    const anchor = new Date(anchorDateStr + 'T12:00:00');
+    anchor.setHours(0, 0, 0, 0);
+    const set = new Set();
+    const rangeStart = new Date();
+    rangeStart.setMonth(rangeStart.getMonth() - 2);
+    rangeStart.setHours(0, 0, 0, 0);
+    const rangeEnd = new Date();
+    rangeEnd.setMonth(rangeEnd.getMonth() + 6);
+    rangeEnd.setHours(23, 59, 59, 999);
+    let p = new Date(anchor.getTime());
+    while (p.getTime() > rangeStart.getTime()) p.setDate(p.getDate() - avgCycleDays);
+    for (; p.getTime() <= rangeEnd.getTime(); p.setDate(p.getDate() + avgCycleDays)) {
+      for (let i = 0; i < PERIOD_LENGTH_DAYS; i++) {
+        const d = new Date(p);
+        d.setDate(d.getDate() + i);
+        if (d.getTime() >= rangeStart.getTime() && d.getTime() <= rangeEnd.getTime())
+          set.add(formatDate(d));
+      }
+    }
+    return Array.from(set);
+  }
+
+  function computePeriodFromInput(startDateStrs) {
+    if (startDateStrs.length === 0) return { periodDates: [], avgCycle: 28 };
+    const starts = startDateStrs.map(s => new Date(s + 'T12:00:00'));
+    starts.forEach(d => d.setHours(0, 0, 0, 0));
+    let avgCycleDays = 28;
+    if (starts.length >= 2) {
+      let totalGap = 0, count = 0;
+      for (let i = 1; i < starts.length; i++) {
+        totalGap += Math.round((starts[i] - starts[i - 1]) / (24 * 60 * 60 * 1000));
+        count++;
+      }
+      if (count > 0) avgCycleDays = Math.round(totalGap / count);
+      if (avgCycleDays < 21) avgCycleDays = 21;
+      if (avgCycleDays > 45) avgCycleDays = 45;
+    }
+    const lastStart = new Date(starts[starts.length - 1].getTime());
+    lastStart.setDate(lastStart.getDate() + avgCycleDays);
+    const nextStartStr = formatDate(lastStart);
+    return { periodDates: projectPeriodDatesFromAnchor(nextStartStr, avgCycleDays), avgCycle: avgCycleDays, anchor: nextStartStr };
+  }
+
+  function isPeriodDay(dateStr) { return periodDates.includes(dateStr); }
+
+  function getPeriodStartsInRange(fromDate, toDate) {
+    if (!periodAnchorStr || !periodAvgCycle) return [];
+    const anchor = new Date(periodAnchorStr + 'T12:00:00');
+    anchor.setHours(0, 0, 0, 0);
+    const out = [];
+    let p = new Date(anchor.getTime());
+    while (p.getTime() > fromDate.getTime()) p.setDate(p.getDate() - periodAvgCycle);
+    while (p.getTime() <= toDate.getTime()) {
+      if (p.getTime() >= fromDate.getTime()) out.push(formatDate(p));
+      p.setDate(p.getDate() + periodAvgCycle);
+    }
+    return out;
+  }
+
+  function getPmsAndGoldenDates() {
+    const rangeStart = new Date();
+    rangeStart.setMonth(rangeStart.getMonth() - 1);
+    rangeStart.setHours(0, 0, 0, 0);
+    const rangeEnd = new Date();
+    rangeEnd.setMonth(rangeEnd.getMonth() + 3);
+    rangeEnd.setHours(23, 59, 59, 999);
+    const starts = getPeriodStartsInRange(rangeStart, rangeEnd);
+    const pmsSet = new Set();
+    const goldenSet = new Set();
+    starts.forEach(startStr => {
+      const start = new Date(startStr + 'T12:00:00');
+      for (let i = -5; i <= 2; i++) {
+        const d = new Date(start);
+        d.setDate(d.getDate() + i);
+        if (d >= rangeStart && d <= rangeEnd) pmsSet.add(formatDate(d));
+      }
+      for (let i = 9; i <= 15; i++) {
+        const d = new Date(start);
+        d.setDate(d.getDate() + i);
+        if (d >= rangeStart && d <= rangeEnd) goldenSet.add(formatDate(d));
+      }
+    });
+    return { pms: Array.from(pmsSet), golden: Array.from(goldenSet) };
+  }
+
+  function getNextPmsAndGoldenRanges() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const rangeEnd = new Date();
+    rangeEnd.setMonth(rangeEnd.getMonth() + 2);
+    const starts = getPeriodStartsInRange(today, rangeEnd);
+    if (starts.length === 0) return { pms: null, golden: null };
+    const nextStart = new Date(starts[0] + 'T12:00:00');
+    const pmsStart = new Date(nextStart);
+    pmsStart.setDate(pmsStart.getDate() - 5);
+    const pmsEnd = new Date(nextStart);
+    pmsEnd.setDate(pmsEnd.getDate() + 2);
+    const goldenStart = new Date(nextStart);
+    goldenStart.setDate(goldenStart.getDate() + 9);
+    const goldenEnd = new Date(nextStart);
+    goldenEnd.setDate(goldenEnd.getDate() + 15);
+    return {
+      pms: { from: formatDate(pmsStart), to: formatDate(pmsEnd) },
+      golden: { from: formatDate(goldenStart), to: formatDate(goldenEnd) }
+    };
+  }
+
+  function formatDateShort(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return m + '월 ' + d + '일';
+  }
+
+  function renderPeriodResultSection() {
+    const section = document.getElementById('periodResultSection');
+    const avgLabel = document.getElementById('periodAvgCycleLabel');
+    const pmsRange = document.getElementById('periodPmsRange');
+    const goldenRange = document.getElementById('periodGoldenRange');
+    const phaseCal = document.getElementById('periodPhaseCal');
+    if (!section || !periodAnchorStr) return;
+    section.classList.remove('hidden');
+    if (avgLabel) avgLabel.textContent = periodAvgCycle;
+    const ranges = getNextPmsAndGoldenRanges();
+    if (pmsRange && ranges.pms) pmsRange.textContent = '기분 안 좋을 수 있어요: ' + formatDateShort(ranges.pms.from) + ' ~ ' + formatDateShort(ranges.pms.to);
+    if (goldenRange && ranges.golden) goldenRange.textContent = '황금기: ' + formatDateShort(ranges.golden.from) + ' ~ ' + formatDateShort(ranges.golden.to);
+    const { pms: pmsDates, golden: goldenDates } = getPmsAndGoldenDates();
+    const now = new Date();
+    let calHtml = '';
+    for (let m = 0; m < 2; m++) {
+      const y = m === 0 ? now.getFullYear() : (now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear());
+      const mo = m === 0 ? now.getMonth() : (now.getMonth() + 1) % 12;
+      calHtml += '<p class="text-[#C0C0C0] text-xs font-impact mt-2 mb-1">' + (mo + 1) + '월</p>';
+      calHtml += '<div class="grid grid-cols-7 gap-0.5 text-[10px]">';
+      const first = new Date(y, mo, 1);
+      const last = new Date(y, mo + 1, 0);
+      let dow = first.getDay(); if (dow === 0) dow = 7;
+      for (let i = 0; i < dow - 1; i++) calHtml += '<div></div>';
+      for (let day = 1; day <= last.getDate(); day++) {
+        const dateStr = y + '-' + String(mo + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+        let cls = 'py-1 rounded ';
+        if (periodDates.includes(dateStr)) cls += 'period-day-pink ';
+        else if (pmsDates.includes(dateStr)) cls += 'period-phase-pms ';
+        else if (goldenDates.includes(dateStr)) cls += 'period-phase-golden ';
+        else cls += 'text-[#808080] ';
+        calHtml += '<div class="' + cls + '">' + day + '</div>';
+      }
+      calHtml += '</div>';
+    }
+    if (phaseCal) phaseCal.innerHTML = calHtml;
+  }
+
+  function applyPeriodAnchor(anchorStr, avgCycle) {
+    periodAnchorStr = anchorStr;
+    periodAvgCycle = avgCycle || periodAvgCycle;
+    periodDates = projectPeriodDatesFromAnchor(anchorStr, periodAvgCycle);
+    localStorage.setItem('remind_period_dates', JSON.stringify(periodDates));
+    localStorage.setItem('remind_period_anchor', periodAnchorStr);
+    localStorage.setItem('remind_period_avg_cycle', String(periodAvgCycle));
+  }
+
+  document.getElementById('bodyWeatherBtn').addEventListener('click', () => {
+    const input = document.getElementById('periodStartInput');
+    if (input && localStorage.getItem('remind_period_input')) input.value = localStorage.getItem('remind_period_input');
+    renderPeriodResultSection();
+    document.getElementById('periodStartModal').classList.remove('hidden');
+    document.getElementById('periodStartModal').classList.add('flex');
+  });
+  document.getElementById('periodStartModalClose').addEventListener('click', () => {
+    document.getElementById('periodStartModal').classList.add('hidden');
+    document.getElementById('periodStartModal').classList.remove('flex');
+  });
+  document.getElementById('periodCalcBtn').addEventListener('click', () => {
+    const input = document.getElementById('periodStartInput');
+    const text = input ? input.value : '';
+    const startStrs = parsePeriodStartInput(text);
+    if (startStrs.length === 0) {
+      alert('시작일을 한 줄에 하나씩 입력해 주세요. (예: 2024-11-10)');
+      return;
+    }
+    const result = computePeriodFromInput(startStrs);
+    periodDates = result.periodDates;
+    periodAvgCycle = result.avgCycle;
+    periodAnchorStr = result.anchor;
+    localStorage.setItem('remind_period_dates', JSON.stringify(periodDates));
+    localStorage.setItem('remind_period_input', text);
+    localStorage.setItem('remind_period_avg_cycle', String(periodAvgCycle));
+    localStorage.setItem('remind_period_anchor', periodAnchorStr);
+    renderPeriodResultSection();
+    document.getElementById('periodStartModal').classList.add('hidden');
+    document.getElementById('periodStartModal').classList.remove('flex');
+    renderAll();
+  });
+
+  function renderCalendar() {
+    const now = new Date();
+    const y = now.getFullYear(), mo = now.getMonth();
+    const headerEl = document.getElementById('calendarHeader');
+    headerEl.textContent = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + String(now.getDate()).padStart(2,'0');
+
+    const grid = document.getElementById('calendarGrid');
+    const days = getMonthDays(y, mo);
+    const todayStr = formatDate(now);
+    let html = '';
+    ['M','T','W','T','F','S','S'].forEach(w => { html += '<div class="text-center text-xs text-[#4A5568] font-impact py-1">' + w + '</div>'; });
+    days.forEach(d => {
+      if (d === null) { html += '<div></div>'; return; }
+      const dateStr = `${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isToday = dateStr === todayStr;
+      const hazard = isPeriodDay(dateStr);
+      const dayData = remindData[dateStr];
+      const count = (dayData?.schedule?.length || 0) + (dayData?.diary?.length || 0);
+      let cls = 'py-2 min-h-[3rem] text-center text-sm font-impact chrome-molding cursor-pointer filter drop-shadow flex flex-col items-center justify-start gap-0.5 ';
+      if (hazard) cls += 'period-day-pink ';
+      else if (isToday) cls += 'neon-lime ';
+      else cls += 'metal-magnet text-black ';
+      html += '<button type="button" class="calendar-cell ' + cls + '" data-date="' + dateStr + '"><span>' + d + (count ? ' <span class="text-[10px]">' + count + '</span>' : '') + '</span>';
+      (dayData?.schedule || []).slice(0, 3).forEach(s => {
+        const label = (s.time || '') + ' ' + (s.title || '').slice(0, 6);
+        html += '<span class="calendar-schedule-label">' + escapeHtml(label) + ((s.title || '').length > 6 ? '…' : '') + '</span>';
+      });
+      html += '</button>';
+    });
+    grid.innerHTML = html;
+    grid.querySelectorAll('.calendar-cell').forEach(btn => {
+      btn.addEventListener('click', () => openDateModal(btn.dataset.date));
+    });
+  }
+
+  function renderScheduleList() {
+    const now = new Date();
+    const todayStr = formatDate(now);
+    const day = remindData[todayStr];
+    const list = document.getElementById('scheduleList');
+    if (!day || !day.schedule.length) {
+      list.innerHTML = '<p class="text-[#C0C0C0] text-sm py-4 text-center content-font">No schedule today.</p>';
+      return;
+    }
+    list.innerHTML = day.schedule.map(s => {
+      const sid = (s.id || id());
+      if (!s.id) s.id = sid;
+      return '<div class="schedule-row metal-engraved chrome-molding p-2 text-[#b0b0b0] text-sm filter drop-shadow content-font flex items-center justify-between gap-2" data-date="' + todayStr + '" data-schedule-id="' + escapeHtml(sid) + '"><span><span class="neon-lime-text font-impact">' + escapeHtml(s.time) + '</span> ' + escapeHtml(s.title) + '</span><span class="flex gap-1"><button type="button" class="schedule-edit-btn flex-shrink-0 px-1.5 py-0.5 rounded metal-magnet chrome-molding text-[10px] leading-none text-black" title="수정">수정</button><button type="button" class="schedule-delete-btn flex-shrink-0 w-6 h-6 rounded metal-magnet chrome-molding text-[10px] leading-none text-black hover:bg-red-500 hover:text-white" title="삭제">×</button></span></div>';
+    }).join('');
+    list.querySelectorAll('.schedule-delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const row = btn.closest('.schedule-row');
+        const dateStr = row.dataset.date;
+        const scheduleId = row.dataset.scheduleId;
+        const day = remindData[dateStr];
+        if (day && day.schedule) {
+          day.schedule = day.schedule.filter(x => x.id !== scheduleId);
+          save();
+          renderAll();
+        }
+      });
+    });
+    list.querySelectorAll('.schedule-edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const row = btn.closest('.schedule-row');
+        const dateStr = row.dataset.date;
+        const scheduleId = row.dataset.scheduleId;
+        const day = remindData[dateStr];
+        const item = day && day.schedule && day.schedule.find(x => x.id === scheduleId);
+        if (!item) return;
+        const timeVal = escapeHtml(item.time || '');
+        const titleVal = escapeHtml(item.title || '');
+        row.innerHTML = '<div class="flex flex-col gap-2 w-full"><div class="flex gap-1"><input type="text" class="schedule-edit-time flex-1 min-w-0 metal-engraved chrome-molding px-2 py-1 text-[#b0b0b0] text-xs user-text" value="' + timeVal + '" placeholder="14:00"/><input type="text" class="schedule-edit-title flex-1 min-w-0 metal-engraved chrome-molding px-2 py-1 text-[#b0b0b0] text-xs user-text" value="' + titleVal + '" placeholder="제목"/></div><div class="flex gap-1"><button type="button" class="schedule-save-edit px-2 py-1 rounded neon-lime text-black text-xs font-impact">저장</button><button type="button" class="schedule-cancel-edit px-2 py-1 rounded metal-magnet chrome-molding text-black text-xs">취소</button></div></div>';
+        const timeInput = row.querySelector('.schedule-edit-time');
+        const titleInput = row.querySelector('.schedule-edit-title');
+        row.querySelector('.schedule-save-edit').addEventListener('click', () => {
+          const newTime = (timeInput.value || '').trim() || item.time;
+          const newTitle = (titleInput.value || '').trim() || item.title;
+          item.time = newTime;
+          item.title = newTitle;
           save();
           renderAll();
         });
+        row.querySelector('.schedule-cancel-edit').addEventListener('click', () => renderAll());
       });
+    });
+  }
 
-      const WEEKDAYS = ['월','화','수','목','금','토','일'];
-      const SAT = 6, SUN = 0;
-      function getMonthDays(year, month) {
-        const first = new Date(year, month, 1);
-        const last = new Date(year, month + 1, 0);
-        const startDow = first.getDay();
-        const monStart = startDow === 0 ? 6 : startDow - 1;
-        const days = [];
-        for (let i = 0; i < monStart; i++) days.push(null);
-        for (let d = 1; d <= last.getDate(); d++) days.push(d);
-        return days;
+  function renderArchive() {
+    const stack = document.getElementById('archiveStack');
+    const hintEl = document.getElementById('archiveHint');
+    const allDiary = [];
+    Object.entries(remindData).forEach(([dateStr, day]) => {
+      (day.diary || []).forEach(d => allDiary.push({ ...d, dateStr }));
+    });
+    allDiary.sort((a,b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    if (allDiary.length === 0) {
+      if (hintEl) hintEl.classList.add('hidden');
+      stack.innerHTML = '<p class="text-[#C0C0C0] text-center py-12 content-font">Empty stack.</p>';
+      return;
+    }
+    if (hintEl) hintEl.classList.remove('hidden');
+    let html = '';
+    const cardWidth = 120;
+    const cardHeight = 88;
+    const stepY = 72;
+    const baseLeft = 16;
+    allDiary.forEach((d, i) => {
+      const did = d.id || id();
+      if (!d.id) d.id = did;
+      const saved = archivePositions[did];
+      const left = saved ? saved.x : baseLeft + (i % 2) * 12;
+      const top = saved ? saved.y : 20 + i * stepY;
+      const rot = (i % 3) * 4 - 4;
+      if (d.imageBase64) {
+        html += '<div class="archive-card absolute rounded-lg chrome-molding overflow-hidden bg-white filter drop-shadow content-font cursor-grab active:cursor-grabbing select-none touch-none" data-id="' + escapeHtml(did) + '" style="left:' + left + 'px;top:' + top + 'px;width:' + cardWidth + 'px;transform:rotate(' + rot + 'deg);z-index:1"><img src="' + d.imageBase64 + '" alt="" class="w-full h-28 object-cover pointer-events-none"/><div class="p-1 text-[10px] text-black truncate pointer-events-none">' + escapeHtml((d.content || '').slice(0,20)) + '</div></div>';
+      } else {
+        html += '<div class="archive-card absolute rounded chrome-molding p-2 metal-plate text-black text-xs overflow-hidden filter drop-shadow content-font cursor-grab active:cursor-grabbing select-none touch-none" data-id="' + escapeHtml(did) + '" style="left:' + left + 'px;top:' + top + 'px;width:100px;min-height:60px;transform:rotate(' + rot + 'deg);z-index:1">' + escapeHtml((d.content || '').slice(0, 50)) + (d.content && d.content.length > 50 ? '…' : '') + '</div>';
       }
-      function getDayOfWeek(year, month, day) {
-        return new Date(year, month, day - 1).getDay();
+    });
+    stack.innerHTML = html;
+    stack.querySelectorAll('.archive-card').forEach(card => {
+      let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+      function getPos(e) {
+        if (e.touches) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        return { x: e.clientX, y: e.clientY };
       }
+      function onStart(e) {
+        e.preventDefault();
+        const pos = getPos(e);
+        startX = pos.x;
+        startY = pos.y;
+        startLeft = card.offsetLeft;
+        startTop = card.offsetTop;
+        card.style.zIndex = '10';
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd);
+      }
+      function onMove(e) {
+        e.preventDefault();
+        const pos = getPos(e);
+        const dx = pos.x - startX;
+        const dy = pos.y - startY;
+        card.style.left = (startLeft + dx) + 'px';
+        card.style.top = (startTop + dy) + 'px';
+      }
+      function onEnd() {
+        card.style.zIndex = '1';
+        const lid = parseInt(card.style.left, 10);
+        const tid = parseInt(card.style.top, 10);
+        if (!isNaN(lid) && !isNaN(tid)) {
+          archivePositions[card.dataset.id] = { x: lid, y: tid };
+          saveArchivePositions();
+        }
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+      }
+      card.addEventListener('mousedown', onStart);
+      card.addEventListener('touchstart', onStart, { passive: false });
+    });
+  }
 
-      function renderCalendar() {
-        const now = new Date();
-        const year = now.getFullYear(), month = now.getMonth();
-        const todayStr = formatDateOnly(now);
-        const wrap = document.getElementById('calendarWrap');
-        const days = getMonthDays(year, month);
-        const monthLabel = `${year}년 ${month + 1}월`;
-        let html = '<div class="flex justify-between items-center mb-4"><span class="text-[18px] font-bold text-ink tracking-stationery">' + monthLabel + '</span></div>';
-        html += '<div class="grid grid-cols-7 gap-0 text-center text-[12px] font-semibold text-ink/60 tracking-stationery mb-3">';
-        WEEKDAYS.forEach((w) => {
-          const dayColor = w === '토' ? 'text-sky' : w === '일' ? 'text-red-400' : '';
-          html += '<div class="py-1.5 ' + dayColor + '">' + w + '</div>';
+  function renderMemo() {
+    const byTag = {};
+    Object.entries(remindData).forEach(([, day]) => {
+      (day.diary || []).forEach(d => {
+        const tags = extractTags(d.content || '');
+        tags.forEach(t => {
+          if (!byTag[t]) byTag[t] = [];
+          byTag[t].push(d);
         });
-        html += '</div><div class="grid grid-cols-7 gap-1 text-center">';
-        days.forEach((d) => {
-          if (d === null) { html += '<div class="aspect-square"></div>'; return; }
-          const dow = getDayOfWeek(year, month, d);
-          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-          const isSat = dow === SAT, isSun = dow === SUN;
-          const dayColor = isSun ? 'text-red-400' : isSat ? 'text-sky' : 'text-ink';
-          const isToday = dateStr === todayStr;
-          const periodClass = isPeriodDay(dateStr) ? ' body-weather-period' : '';
-          const count = schedules.filter(s => s.date === dateStr).length;
-          const circleClass = isToday ? ' rounded-full bg-emerald text-white font-bold' : '';
-          const dotHtml = count ? '<span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-light"></span>' : '';
-          html += '<div class="relative aspect-square flex items-center justify-center text-[15px] font-bold ' + dayColor + periodClass + circleClass + '" data-date="' + dateStr + '">' + d + dotHtml + '</div>';
+      });
+    });
+    const container = document.getElementById('memoByTag');
+    const tags = Object.keys(byTag).sort();
+    container.innerHTML = tags.map(tag => '<div class="metal-engraved chrome-molding p-3 filter drop-shadow"><span class="neon-lime-text font-impact">#' + escapeHtml(tag) + '</span><ul class="mt-1 space-y-1 memo-body">' + byTag[tag].map(m => '<li>' + escapeHtml((m.content || '').slice(0,80)) + '</li>').join('') + '</ul></div>').join('') || '<p class="memo-body text-[#C0C0C0] py-8 text-center">No #tags yet.</p>';
+  }
+
+  function renderDeco() {
+    const container = document.getElementById('decoStickers');
+    const tags = Object.entries(remindTags).sort((a,b) => b[1]-a[1]);
+    container.innerHTML = tags.map(([tag, count]) => '<span class="sticker-vinyl px-2 py-1 text-xs content-font inline-block filter drop-shadow" style="transform:rotate(' + ((count * 7) % 20 - 10) + 'deg)">#' + escapeHtml(tag) + ' ×' + count + '</span>').join('') || '<p class="text-[#C0C0C0] text-sm content-font">Collect #tags to get stickers.</p>';
+  }
+
+  const dateModal = document.getElementById('dateModal');
+  const dateModalTitle = document.getElementById('dateModalTitle');
+  const dateModalContent = document.getElementById('dateModalContent');
+  const dateModalInput = document.getElementById('dateModalInput');
+  let selectedDateStr = '';
+
+  function openDateModal(dateStr) {
+    selectedDateStr = dateStr;
+    const d = new Date(dateStr + 'T12:00:00');
+    dateModalTitle.textContent = dateStr + ' — ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
+    const day = ensureDate(dateStr);
+    let html = '<div class="flex flex-wrap items-center gap-2 mb-2">';
+    html += '<button type="button" class="period-set-start-btn py-0.5 px-2 rounded metal-magnet chrome-molding text-[10px] font-impact text-black border border-[#FF0099]">생리 시작일</button>';
+    html += '<span class="text-[#C0C0C0] text-[10px] content-font">기분</span>';
+    const bw = day.bodyWeather || '';
+    [{ v: 'clear', label: '맑음' }, { v: 'cloudy', label: '흐림' }, { v: 'disaster', label: '재앙' }].forEach(({ v, label }) => {
+      const active = bw === v;
+      html += '<button type="button" class="date-weather-btn py-0.5 px-1.5 rounded text-[10px] content-font border ' + (active ? 'neon-lime text-black border-black' : 'metal-magnet chrome-molding text-[#b0b0b0] border-[#666]') + '" data-weather="' + v + '">' + label + '</button>';
+    });
+    html += '</div>';
+    (day.schedule || []).forEach(s => {
+      const sid = s.id || id();
+      if (!s.id) s.id = sid;
+      html += '<div class="schedule-row metal-engraved chrome-molding p-2 text-[#b0b0b0] text-sm content-font flex items-center justify-between gap-2" data-date="' + selectedDateStr + '" data-schedule-id="' + escapeHtml(sid) + '"><span><span class="neon-lime-text">' + escapeHtml(s.time) + '</span> ' + escapeHtml(s.title) + '</span><span class="flex gap-1"><button type="button" class="schedule-edit-btn flex-shrink-0 px-1.5 py-0.5 rounded metal-magnet chrome-molding text-[10px] leading-none text-black" title="수정">수정</button><button type="button" class="schedule-delete-btn flex-shrink-0 w-6 h-6 rounded metal-magnet chrome-molding text-[10px] leading-none text-black" title="삭제">×</button></span></div>';
+    });
+    (day.diary || []).forEach(di => {
+      if (di.imageBase64) {
+        html += '<div class="rounded-lg chrome-molding overflow-hidden bg-white filter drop-shadow content-font"><img src="' + di.imageBase64 + '" alt="" class="w-full max-h-40 object-cover"/><div class="p-2 text-black text-sm">' + escapeHtml(di.content || '') + '</div></div>';
+      } else {
+        html += '<div class="chrome-molding p-2 metal-plate text-black text-sm filter drop-shadow content-font">' + escapeHtml(di.content || '') + '</div>';
+      }
+    });
+    dateModalContent.innerHTML = html || '<p class="text-[#C0C0C0] text-sm content-font">Nothing this day.</p>';
+    const periodSetBtn = dateModalContent.querySelector('.period-set-start-btn');
+    if (periodSetBtn) {
+      periodSetBtn.addEventListener('click', () => {
+        applyPeriodAnchor(selectedDateStr, periodAvgCycle);
+        dateModal.classList.add('hidden');
+        dateModal.classList.remove('flex');
+        renderAll();
+      });
+    }
+    dateModalContent.querySelectorAll('.date-weather-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const weather = btn.dataset.weather;
+        const day = ensureDate(selectedDateStr);
+        day.bodyWeather = weather;
+        save();
+        openDateModal(selectedDateStr);
+      });
+    });
+    dateModalContent.querySelectorAll('.schedule-delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const row = btn.closest('.schedule-row');
+        const scheduleId = row && row.dataset.scheduleId;
+        const day = ensureDate(selectedDateStr);
+        if (day.schedule && scheduleId) {
+          day.schedule = day.schedule.filter(x => x.id !== scheduleId);
+          save();
+          openDateModal(selectedDateStr);
+        }
+      });
+    });
+    dateModalContent.querySelectorAll('.schedule-edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const row = btn.closest('.schedule-row');
+        const scheduleId = row.dataset.scheduleId;
+        const day = ensureDate(selectedDateStr);
+        const item = day.schedule && day.schedule.find(x => x.id === scheduleId);
+        if (!item) return;
+        const timeVal = escapeHtml(item.time || '');
+        const titleVal = escapeHtml(item.title || '');
+        row.innerHTML = '<div class="flex flex-col gap-2 w-full"><div class="flex gap-1"><input type="text" class="schedule-edit-time flex-1 min-w-0 metal-engraved chrome-molding px-2 py-1 text-[#b0b0b0] text-xs user-text" value="' + timeVal + '" placeholder="14:00"/><input type="text" class="schedule-edit-title flex-1 min-w-0 metal-engraved chrome-molding px-2 py-1 text-[#b0b0b0] text-xs user-text" value="' + titleVal + '" placeholder="제목"/></div><div class="flex gap-1"><button type="button" class="schedule-save-edit px-2 py-1 rounded neon-lime text-black text-xs font-impact">저장</button><button type="button" class="schedule-cancel-edit px-2 py-1 rounded metal-magnet chrome-molding text-black text-xs">취소</button></div></div>';
+        const timeInput = row.querySelector('.schedule-edit-time');
+        const titleInput = row.querySelector('.schedule-edit-title');
+        row.querySelector('.schedule-save-edit').addEventListener('click', () => {
+          item.time = (timeInput.value || '').trim() || item.time;
+          item.title = (titleInput.value || '').trim() || item.title;
+          save();
+          openDateModal(selectedDateStr);
         });
-        html += '</div>';
-        wrap.innerHTML = html;
-      }
+        row.querySelector('.schedule-cancel-edit').addEventListener('click', () => openDateModal(selectedDateStr));
+      });
+    });
+    dateModalInput.value = '';
+    dateModal.classList.remove('hidden');
+    dateModal.classList.add('flex');
+  }
+  document.getElementById('dateModalClose').addEventListener('click', () => {
+    dateModal.classList.add('hidden');
+    dateModal.classList.remove('flex');
+  });
+  document.getElementById('dateModalSave').addEventListener('click', () => {
+    const text = dateModalInput.value.trim();
+    if (!text || !selectedDateStr) { dateModal.classList.add('hidden'); dateModal.classList.remove('flex'); return; }
+    const day = ensureDate(selectedDateStr);
+    day.diary = day.diary || [];
+    day.diary.push({ id: id(), content: text, imageBase64: null, createdAt: new Date().toISOString() });
+    updateUserStats();
+    save();
+    dateModal.classList.add('hidden');
+    dateModal.classList.remove('flex');
+    renderAll();
+  });
 
-      function renderScheduleList() {
-        const list = document.getElementById('scheduleList');
-        const today = formatDateOnly(new Date());
-        const relevant = schedules.filter(s => s.date >= today).sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
-        list.innerHTML = relevant.slice(0, 30).map(s =>
-          '<div class="flex items-center gap-3 py-3 px-4 rounded-2xl bg-white shadow-soft"><span class="text-sm font-bold text-emerald shrink-0">' + s.date + (s.time ? ' ' + s.time : '') + '</span><span class="text-ink font-medium truncate">' + escapeHtml(s.title) + '</span></div>'
-        ).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center tracking-stationery">No schedules yet.</p>';
-      }
+  function renderAll() {
+    updateUserStats();
+    renderCalendar();
+    renderScheduleList();
+    renderArchive();
+    renderMemo();
+    renderDeco();
+  }
 
-      function renderDiary() {
-        const list = document.getElementById('diaryList');
-        const sorted = [...diaries].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-        list.innerHTML = sorted.map(d => {
-          const date = new Date(d.createdAt);
-          const dateStr = date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
-          let block = '<div class="rounded-3xl p-5 bg-white shadow-soft"><div class="text-[13px] font-medium text-ink/50 mb-3 tracking-stationery">' + dateStr + '</div>';
-          if (d.imageBase64) block += '<img src="' + d.imageBase64 + '" alt="" class="w-full rounded-2xl mb-4 max-h-52 object-cover shadow-soft" />';
-          block += '<p class="text-ink leading-relaxed whitespace-pre-wrap text-[15px] tracking-stationery">' + escapeHtml(d.content || '') + '</p></div>';
-          return block;
-        }).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center tracking-stationery">No entries yet.</p>';
-      }
-
-      function renderMemo() {
-        const byTag = {};
-        memos.forEach(m => {
-          m.tags.forEach(t => {
-            if (!byTag[t]) byTag[t] = [];
-            byTag[t].push(m);
-          });
-        });
-        const container = document.getElementById('memoByTag');
-        const tags = Object.keys(byTag).sort();
-        container.innerHTML = tags.map(tag =>
-          '<div class="rounded-3xl p-5 bg-white shadow-soft"><h4 class="text-emerald font-bold text-[16px] mb-3 tracking-stationery">#' + escapeHtml(tag) + '</h4><ul class="space-y-2">' +
-          byTag[tag].map(m => '<li class="text-ink/80 text-[15px] leading-relaxed">' + escapeHtml(m.content.slice(0, 120) + (m.content.length > 120 ? '…' : '')) + '</li>').join('') +
-          '</ul></div>'
-        ).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center tracking-stationery">No tagged memos yet.</p>';
-      }
-
-      function growthStage(count) {
-        if (count >= 10) return 4;
-        if (count >= 5) return 3;
-        if (count >= 2) return 2;
-        return 1;
-      }
-      const COSMOS = ['🌱','🌿','🌻','🌸'];
-      const LILY = ['🌱','🍃','💐','✨'];
-      function renderGarden() {
-        const grid = document.getElementById('gardenGrid');
-        const entries = Object.entries(gardenTags).map(([tag, count]) => ({ tag, count, stage: growthStage(count) }));
-        entries.sort((a, b) => b.count - a.count);
-        grid.innerHTML = entries.map(({ tag, count, stage }) => {
-          const useCosmos = tag.length % 2 === 0;
-          const icons = useCosmos ? COSMOS : LILY;
-          const name = useCosmos ? '코스모스' : '은방울꽃';
-          return '<div class="rounded-3xl p-5 bg-white shadow-soft text-center"><div class="text-[32px] mb-2">' + icons[stage - 1] + '</div><div class="text-emerald font-bold text-[15px] tracking-stationery">#' + escapeHtml(tag) + '</div><div class="text-[12px] text-ink/50 mt-0.5">' + name + ' ' + stage + '단계 · ' + count + '개</div></div>';
-        }).join('') || '<p class="text-ink/50 text-[15px] font-medium py-8 text-center col-span-2 tracking-stationery">Collect tags to grow flowers.</p>';
-      }
-
-      function escapeHtml(s) {
-        const div = document.createElement('div');
-        div.textContent = s;
-        return div.innerHTML;
-      }
-
-      function renderAll() {
-        updateBodyWeatherHeader();
-        renderCalendar();
-        renderScheduleList();
-        renderDiary();
-        renderMemo();
-        renderGarden();
-      }
-
-      renderAll();
-    })();
+  renderAll();
+})();
   </script>
 </body>
 </html>
