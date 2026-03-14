@@ -53,6 +53,7 @@ function eDD(text){
 const results=[];
 const todayFull=new Date(tS + 'T00:00:00');
 const y=todayFull.getFullYear();
+function aY(mo,d){return new Date(y,mo-1,d)<todayFull?y+1:y;}
 function eFD(t){
 let m;
 m=t.match(/(\d{4})[-./](\d{1,2})[-./](\d{1,2})/);
@@ -68,11 +69,11 @@ if(yr>=1990&&yr<=2099&&mo>=1&&mo<=12&&d>=1&&d<=31)
 return `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 }
 m=t.match(/(\d{1,2})월\s*(\d{1,2})일?/);
-if(m){const mo=parseInt(m[1]),d=parseInt(m[2]);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+if(m){const mo=parseInt(m[1]),d=parseInt(m[2]);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${aY(mo,d)}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 m=t.match(/(\d{1,2})\/(\d{1,2})/);
-if(m){const mo=parseInt(m[1]),d=parseInt(m[2]);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+if(m){const mo=parseInt(m[1]),d=parseInt(m[2]);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${aY(mo,d)}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 m=t.match(/(?<!\d)(\d{1,2})-(\d{1,2})(?!\d)/);
-if(m){const mo=parseInt(m[1]),d=parseInt(m[2]);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+if(m){const mo=parseInt(m[1]),d=parseInt(m[2]);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${aY(mo,d)}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 return null;
 }
 const date=eFD(text);
@@ -195,17 +196,17 @@ if(m)return m[1].padStart(2,'0')+ ':00';
 return null;
 }
 function pDT(text){
-const y=new Date().getFullYear();let m;
+const _now=new Date();const y=_now.getFullYear();function aY(mo,d){return new Date(y,mo-1,d)<_now?y+1:y;}let m;
 m=text.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
 if(m){const mo=parseInt(m[2],10),d=parseInt(m[3],10);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${m[1]}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 m=text.match(/(\d{1,2})월\s*(\d{1,2})일?/);
-if(m){const mo=parseInt(m[1],10),d=parseInt(m[2],10);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+if(m){const mo=parseInt(m[1],10),d=parseInt(m[2],10);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${aY(mo,d)}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 m=text.match(/(\d{1,2})\/(\d{1,2})(?:일)?/);
-if(m){const mo=parseInt(m[1],10),d=parseInt(m[2],10);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+if(m){const mo=parseInt(m[1],10),d=parseInt(m[2],10);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${aY(mo,d)}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 m=text.match(/(?<!\d)(\d{1,2})-(\d{1,2})(?!\d)/);
-if(m){const mo=parseInt(m[1],10),d=parseInt(m[2],10);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+if(m){const mo=parseInt(m[1],10),d=parseInt(m[2],10);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${aY(mo,d)}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 m=text.match(/(\d{1,2})\.(\d{1,2})(?:일)?/);
-if(m){const mo=parseInt(m[1],10),d=parseInt(m[2],10);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+if(m){const mo=parseInt(m[1],10),d=parseInt(m[2],10);if(mo>=1&&mo<=12&&d>=1&&d<=31)return `${aY(mo,d)}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 return null;
 }
 function sDT(text){
@@ -1260,8 +1261,9 @@ return url;
 }
 }
 document.getElementById('favAddBtn').addEventListener('click',()=>{
-document.getElementById('favUrlInput').value='';document.getElementById('favTitleInput').value='';document.getElementById('favCatInput').value='';
-document.getElementById('favAddModal').classList.add('active');
+const _fu=document.getElementById('favUrlInput');const _ft=document.getElementById('favTitleInput');const _fc=document.getElementById('favCatInput');
+if(_fu)_fu.value='';if(_ft)_ft.value='';if(_fc)_fc.value='';
+const _fm=document.getElementById('favAddModal');if(_fm)_fm.classList.add('active');
 });
 const favUrlInput=document.getElementById('favUrlInput');
 const favTitleInput=document.getElementById('favTitleInput');
@@ -1282,13 +1284,15 @@ favTitleInput.select();
 });
 }
 document.getElementById('favAddSubmit').addEventListener('click',()=>{
-const url=document.getElementById('favUrlInput').value.trim();
+const _fu=document.getElementById('favUrlInput');const _ft=document.getElementById('favTitleInput');const _fc=document.getElementById('favCatInput');
+if(!_fu||!_ft||!_fc)return;
+const url=_fu.value.trim();
 if(!url){alert('URL을 입력해 주세요.');return;}
-let title=document.getElementById('favTitleInput').value.trim();
+let title=_ft.value.trim();
 if(!title){
 try{title=eDU(url);}catch(e){title=url;}
 }
-const catRaw=document.getElementById('favCatInput').value.trim();
+const catRaw=_fc.value.trim();
 const tags=eT(catRaw);const category=tags.length?tags[0]:(catRaw.replace('#','').trim()||'기타');
 if(fv.some(f=>f.url===url)){alert('이미 저장된 URL입니다.');return;}
 fv.push({id:uid(),category,title,url,createdAt:new Date().toISOString()});
