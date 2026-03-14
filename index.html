@@ -385,12 +385,12 @@ if(mId==='dumpModal')document.body.classList.remove('dump-modal-open');
 if(mId==='editContentModal')cE=null;
 if(mId==='favFolderModal')fCF=null;
 });
-function pSA(cb){
+function pSA(msg,cb){
 sC.className='animate-paper-suck';sC.style.cssText='background:#fef3c7;';sC.textContent='📄';
 sO.classList.add('active');
 setTimeout(()=>{
 sC.className='';sC.textContent='';sO.classList.remove('active');
-sT('버리기 완료!');
+if(msg)sT(msg);
 if(cb)cb();
 },520);
 }
@@ -415,101 +415,92 @@ sFv();
 dSu.addEventListener('click',async()=>{
 const text=dX.value.trim();
 const showArchiveEl=document.getElementById('dumpShowInArchive');
-const showArchive=showArchiveEl ? showArchiveEl.checked : true;
+const showArchive=showArchiveEl?showArchiveEl.checked:true;
 const imageFiles=document.getElementById('dumpImages');
 const images=[];
-if(imageFiles && imageFiles.files && imageFiles.files.length > 0){
-for(let i=0;i < imageFiles.files.length;i++){
+if(imageFiles&&imageFiles.files&&imageFiles.files.length>0){
+for(let i=0;i<imageFiles.files.length;i++){
 const file=imageFiles.files[i];
+try{
 const dateStr=await gPS(file);
-const imageBase64=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(file);});
-images.push({dateStr,imageBase64,name: file.name});
+const imageBase64=await new Promise((r,rej)=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=rej;fr.readAsDataURL(file);});
+images.push({dateStr,imageBase64,name:file.name});
+}catch(e){console.warn('image read error',e);}
 }
 }
-if(images.length > 0){
+function closeDump(){document.body.classList.remove('dump-modal-open');dM.classList.remove('active');}
+if(images.length>0){
 const dateMap={};
 images.forEach(img=>{
 const d=eD(img.dateStr);
-d.diaries.push({
-id: uid(),
-content: text || '',
-imageBase64: img.imageBase64,
-createdAt: new Date().toISOString(),
-showInArchive: showArchive,
-abyss: false
+d.diaries.push({id:uid(),content:text||'',imageBase64:img.imageBase64,createdAt:new Date().toISOString(),showInArchive:showArchive,abyss:false});
+dateMap[img.dateStr]=(dateMap[img.dateStr]||0)+1;
 });
-dateMap[img.dateStr]=(dateMap[img.dateStr]|| 0)+ 1;
-});
-if(text){const urls=eU(text);if(urls.length > 0)aSL(text);}
+if(text){const urls=eU(text);if(urls.length>0)aSL(text);}
 uUS();sv();
+closeDump();
 const dateList=Object.entries(dateMap).sort(([a],[b])=>a.localeCompare(b));
 const summary=dateList.map(([d,n])=>`${d.slice(5)} (${n}장)`).join(', ');
-pSA(()=>{
-document.body.classList.remove('dump-modal-open');dM.classList.remove('active');
-rA();
-sT(`📷 ${summary} 저장 완료`);
-});
+const photoMsg=text?`📷 사진 ${images.length}장 + 메모 저장 완료 · ${summary}`:`📷 사진 ${images.length}장 저장 완료 · ${summary}`;
+pSA(photoMsg,()=>{rA();});
 return;
 }
-if(!text){
-pSA(()=>{document.body.classList.remove('dump-modal-open');dM.classList.remove('active');});
-return;
-}
-const urls=eU(text);
-if(urls.length > 0)aSL(text);
+if(!text){closeDump();pSA('',null);return;}
+const urls=eU(text);const hasUrl=urls.length>0;
+if(hasUrl)aSL(text);
 if(text.includes('#반복일정')){
 const recurResult=pRS(text);
 if(recurResult){
 let count=0;
 recurResult.dates.forEach(dateStr=>{
 const day=eD(dateStr);
-day.schedules.push({id: uid(),title: recurResult.title,time: '',createdAt: new Date().toISOString(),recurring: true});
+day.schedules.push({id:uid(),title:recurResult.title,time:'',createdAt:new Date().toISOString(),recurring:true});
 count++;
 });
 uUS();sv();
-pSA(()=>{
-document.body.classList.remove('dump-modal-open');dM.classList.remove('active');
-rA();
-alert('✓ 반복 일정 ' + count + '개 등록 완료!\n「' + recurResult.title + '」 ' + recurResult.desc);
-});
+closeDump();
+pSA(`🔁 반복 일정 ${count}개 등록 완료 · 「${recurResult.title}」`,()=>{rA();});
 return;
 }
 }
 const ddayMatches=eDD(text);
-if(ddayMatches.length > 0){
-ddayMatches.forEach(dd=>{
-dd.push({id: uid(),title: dd.title,date: dd.date,createdAt: new Date().toISOString()});
+if(ddayMatches.length>0){
+ddayMatches.forEach(match=>{
+dd.push({id:uid(),title:match.title,date:match.date,createdAt:new Date().toISOString()});
 });
-sDd();
-uUS();sv();
-pSA(()=>{document.body.classList.remove('dump-modal-open');dM.classList.remove('active');rA();});
+sDd();uUS();sv();
+closeDump();
+const ddNames=ddayMatches.map(m=>m.title).join(', ');
+pSA(`📅 D-Day ${ddayMatches.length}개 추가 완료 · ${ddNames}`,()=>{rA();});
 return;
 }
-const targetDateStr=pDT(text)|| tS;
+const targetDateStr=pDT(text)||tS;
 const timeStr=pTm(text);
-const hasScheduleKeyword=text.includes('#예약')|| text.includes('#일정');
-const isSchedule=!!timeStr || !!pDT(text)|| hasScheduleKeyword;
+const hasScheduleKeyword=text.includes('#예약')||text.includes('#일정');
+const isSchedule=!!timeStr||!!pDT(text)||hasScheduleKeyword;
 if(isSchedule){
 const tags=eT(text);
-tags.forEach(t=>{if(t !== '어비스' && t !== '비밀')rT[t]=(rT[t]|| 0)+ 1;});
+tags.forEach(t=>{if(t!=='어비스'&&t!=='비밀')rT[t]=(rT[t]||0)+1;});
 const day=eD(targetDateStr);
-day.schedules.push({id: uid(),title: sDT(text),time: timeStr || '',createdAt: new Date().toISOString()});
+day.schedules.push({id:uid(),title:sDT(text),time:timeStr||'',createdAt:new Date().toISOString()});
 uUS();sv();
-pSA(()=>{document.body.classList.remove('dump-modal-open');dM.classList.remove('active');rA();});
+closeDump();
+const schedMsg=timeStr?`📆 일정 등록 완료 · ${targetDateStr} ${timeStr}`:`📆 일정 등록 완료 · ${targetDateStr}`;
+pSA(schedMsg,()=>{rA();});
 return;
 }
 const abyssFlag=iac(text);
 let finalContent=text;
-if(!abyssFlag && imc(text)){
-if(!finalContent.includes('#메모'))finalContent=finalContent + ' #메모';
+if(!abyssFlag&&imc(text)){
+if(!finalContent.includes('#메모'))finalContent=finalContent+' #메모';
 }
-if(!abyssFlag){
-eT(finalContent).forEach(t=>{rT[t]=(rT[t]|| 0)+ 1;});
-}
+if(!abyssFlag){eT(finalContent).forEach(t=>{rT[t]=(rT[t]||0)+1;});}
 const day2=eD(targetDateStr);
-day2.diaries.push({id: uid(),content: finalContent,imageBase64: null,createdAt: new Date().toISOString(),showInArchive: showArchive,abyss: abyssFlag});
+day2.diaries.push({id:uid(),content:finalContent,imageBase64:null,createdAt:new Date().toISOString(),showInArchive:showArchive,abyss:abyssFlag});
 uUS();sv();
-pSA(()=>{document.body.classList.remove('dump-modal-open');dM.classList.remove('active');rA();});
+closeDump();
+const memoMsg=abyssFlag?'🌑 어비스에 저장되었습니다':hasUrl?'📝 메모 + 🔗 즐겨찾기 저장 완료':'📝 메모가 저장되었습니다';
+pSA(memoMsg,()=>{rA();});
 });
 let pD=[],pC=28,pA='';
 try{pD=JSON.parse(localStorage.getItem('remind_period_dates')||'[]');}catch(e){}
